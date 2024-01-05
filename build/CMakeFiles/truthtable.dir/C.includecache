@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/circuit.h
+stdbool.h
+-
+stdlib.h
+-
+variable.h
+../include/variable.h
+gate.h
+../include/gate.h
+
+../include/gate.h
+stdbool.h
+-
+stdlib.h
+-
+
+../include/variable.h
+stdbool.h
+-
+stdlib.h
+-
+
+F:/Coding Projects/C/truthtable_c_refactor/src/truthtable.c
+stdlib.h
+-
+stdio.h
+-
+string.h
+-
+stdbool.h
+-
+circuit.h
+F:/Coding Projects/C/truthtable_c_refactor/src/circuit.h
+variable.h
+F:/Coding Projects/C/truthtable_c_refactor/src/variable.h
+

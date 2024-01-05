@@ -1,0 +1,5 @@
+INPUT 3 a b c
+OUTPUT 1 z
+AND a b x
+AND a c y
+OR x y z

@@ -1,0 +1,8 @@
+{
+    "cmake.configureOnOpen": true,
+    "cmake.debugConfig": {
+        "args": [
+            "test.txt", 
+        ]
+    },
+}

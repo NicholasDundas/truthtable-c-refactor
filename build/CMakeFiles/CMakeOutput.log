@@ -1,0 +1,30 @@
+The system is: Windows - 10.0.19045 - AMD64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: C:/msys64/ucrt64/bin/gcc.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.exe"
+
+The C compiler identification is GNU, found in "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/3.17.0-rc2/CompilerIdC/a.exe"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/msys64/ucrt64/bin/mingw32-make.exe cmTC_9068a/fast && C:/msys64/ucrt64/bin/mingw32-make.exe -f CMakeFiles\cmTC_9068a.dir\build.make CMakeFiles/cmTC_9068a.dir/build
+mingw32-make[1]: Entering directory 'F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9068a.dir/testCCompiler.c.obj
+C:\msys64\ucrt64\bin\gcc.exe    -o CMakeFiles\cmTC_9068a.dir\testCCompiler.c.obj   -c "F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles\CMakeTmp\testCCompiler.c"
+Linking C executable cmTC_9068a.exe
+"C:\Program Files\CMake\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_9068a.dir\link.txt --verbose=1
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_9068a.dir/objects.a
+C:\msys64\ucrt64\bin\ar.exe cr CMakeFiles\cmTC_9068a.dir/objects.a @CMakeFiles\cmTC_9068a.dir\objects1.rsp
+C:\msys64\ucrt64\bin\gcc.exe      -Wl,--whole-archive CMakeFiles\cmTC_9068a.dir/objects.a -Wl,--no-whole-archive  -o cmTC_9068a.exe -Wl,--out-implib,libcmTC_9068a.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\cmTC_9068a.dir\linklibs.rsp
+mingw32-make[1]: Leaving directory 'F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/CMakeTmp'
+
+
+

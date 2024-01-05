@@ -207,7 +207,7 @@ int main(int argc, char** argv) {
         for (size_t c = 0; c < cir->gate_len; c++) {
             if (gate_return(&(cir->gates[c])) != 0) {
                 fprintf(stderr, "Invalid gate attempted run, %d", cir->gates[c].kind);
-                goto EXIT_FAILURE;
+                goto FAIL;
             }
         }
 

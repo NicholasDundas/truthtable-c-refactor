@@ -32,7 +32,7 @@ int insert_var(circuit* c, type_t type, char* name, bool value) {
         ++c->var_len;
         return 0;
     }
-    return -1;
+    return 1;
 }
 
 circuit* init_circuit(void) {
@@ -80,5 +80,5 @@ int insert_gate(circuit* c, kind_t kind, bool** params, size_t size) {
         ++c->gate_len;
         return 0;
     }
-    return -1;
+    return 1;
 }

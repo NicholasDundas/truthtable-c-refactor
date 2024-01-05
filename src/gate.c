@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-int gate_return(gate* g) { 
+gate_return_result gate_return(gate* g) { 
     if (g != NULL) {
         size_t os; //output selector for Decoders/Multiplexers
         switch (g->kind) {
@@ -44,9 +44,9 @@ int gate_return(gate* g) {
                 *g->params[g->size + ((size_t)2 << g->size)] = *g->params[os];
                 break;
             default:
-                return -3;
+                return INVALID_GATE_PASSED;
         }
-        return g->kind;
+        return GATE_RUN_SUCCESS;
     }
-        return -1;
+        return NULL_GATE_PASSED;
 }

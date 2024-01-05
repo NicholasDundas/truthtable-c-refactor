@@ -36,7 +36,10 @@ typedef struct {
     // includes inputs and outputs, indicated by variable numbers
 } gate;
 
-//Preforms gate action on the gate pointed. Returns 0 on success and -1 if an error has occured or -3 if invalid gate
-int gate_return(gate* g);
+
+typedef enum { GATE_RUN_SUCCESS, INVALID_GATE_PASSED, NULL_GATE_PASSED  } gate_return_result;
+
+//Preforms gate action on the gate pointed. returns the result 
+gate_return_result gate_return(gate* g);
 
 #endif

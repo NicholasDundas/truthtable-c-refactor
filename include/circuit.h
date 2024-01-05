@@ -26,7 +26,10 @@ typedef struct {
     size_t var_cap; //Capacity of variables* (used for realloc efficiency)
 } circuit;
 
-//returns 0 on success, -1 on null circuit or name passed, or -2 on memory allocation failure
+#define INSERT_GATE_FAILURE 1
+//attempts to insert a variable into c
+//maximum length of name is defined by NAME_SIZE in variable.h
+//returns 0 on success or 1 on failure
 int insert_var(circuit* c, type_t type, char* name, bool value); 
 
 //Initialize an Empty Circuit
@@ -35,12 +38,15 @@ circuit* init_circuit(void);
 //Free a circuit (Must be initialized)
 void free_circuit(circuit* cir);
 
-//Returns var_len of circuit on failure or GET_VAR_NULL_PASSED if a null was passed to either parameter
-size_t get_var(circuit* c, char* name); 
-
 //Error Result of GET_VAR
 #define GET_VAR_NULL_PASSED SIZE_MAX
 
-//returns -1 on null gate passed or -2 on memory allocation failure
+//Returns var_len of circuit on failure or GET_VAR_NULL_PASSED if a null was passed to either parameter
+size_t get_var(circuit* c, char* name); 
+
+
+#define INSERT_VAR_FAILURE 1
+//attempts to add gate type of kind to c and returns 0 on success or 1 on failure
+//size and params must match with gate type or UB will occur
 int insert_gate(circuit* c, kind_t kind, bool** params, size_t size); 
 #endif

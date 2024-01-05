@@ -9,17 +9,13 @@
 
 #define MAX_SIZE (size_t)32
 
-//errors and exits automatically
-void perror_exit(char* msg) {
-    perror(msg);
-    exit(EXIT_FAILURE);
-}
 
 //reads into buffer and exits if fails
 int readbuf(FILE* file,void* buf,char* format,char* errmsg) { 
     int readerr = fscanf(file, format, buf);
     if (readerr <= 0) {
-        perror_exit(errmsg);
+        perror(errmsg);
+        exit(EXIT_FAILURE);
     }
     return readerr;
 }
@@ -192,8 +188,10 @@ int main(int argc, char** argv) {
         }
         insert_gate(cir, temp_gate.kind, temp_gate.params, size);       
     }
-    if (read_result != EOF)
-        perror_exit("Could not finish reading gates until end of file");
+    if (read_result != EOF) {
+        fprintf(stderr, "error reading gates, buf = \"%s\"\n%s",buf,strerror(errno));
+        goto FAIL;
+    }
     fclose(finput);
 
     const size_t constant_offset = 3; //Offsets us from the first 3 variables
@@ -207,8 +205,10 @@ int main(int argc, char** argv) {
 
         //Preforming Gate Actions
         for (size_t c = 0; c < cir->gate_len; c++) {
-            if (gate_return(&(cir->gates[c])) < 0)
-                perror_exit("Invalid gate action preformed");
+            if (gate_return(&(cir->gates[c])) != 0) {
+                fprintf(stderr, "Invalid gate attempted run, %d", cir->gates[c].kind);
+                goto EXIT_FAILURE;
+            }
         }
 
         //Printing Current State

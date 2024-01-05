@@ -7,7 +7,7 @@
 #include "variable.h"
 
 
-#define MAX_SIZE (size_t)32
+#define MAX_VAR_COUNT (size_t)32
 
 
 //reads into buffer and exits if fails
@@ -75,8 +75,8 @@ int main(int argc, char** argv) {
     readbuf(finput, buf, nameformat, "error reading \"INPUT\" from file");
     if (strncmp(buf, "INPUT", 5) == 0) {
         readbuf(finput, &input_len, "%zu", "error reading variable N count from file");
-        if (input_len > MAX_SIZE) {
-            fprintf(stderr, "count, \"%zu\", exceeds MAX_SIZE, \"%zu\"", input_len, MAX_SIZE);
+        if (input_len > MAX_VAR_COUNT) {
+            fprintf(stderr, "count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", input_len, MAX_VAR_COUNT);
             goto FAIL;
         }
         for (size_t i = 0; i < input_len; i++) {
@@ -101,8 +101,8 @@ int main(int argc, char** argv) {
     readbuf(finput, buf, nameformat, "error reading \"OUTPUT\" from file");
     if (strncmp(buf, "OUTPUT", 6) == 0) {
         readbuf(finput, &output_len, "%zu", "error reading variable N count from file");
-        if (output_len > MAX_SIZE) {
-            fprintf(stderr, "count, \"%zu\", exceeds MAX_SIZE, \"%zu\"", output_len, MAX_SIZE);
+        if (output_len > MAX_VAR_COUNT) {
+            fprintf(stderr, "count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", output_len, MAX_VAR_COUNT);
             goto FAIL;
         }
         for (size_t i = 0; i < output_len; i++) {
@@ -159,8 +159,8 @@ int main(int argc, char** argv) {
             case DECODER:
             case MULTIPLEXER:
                 readbuf(finput, &size, "%zu", "error reading gate variable N count");
-                if (size > MAX_SIZE) {
-                    fprintf(stderr, "gate size, \"%zu\", exceeds MAX_SIZE, \"%zu\"", size, MAX_SIZE);
+                if (size > MAX_VAR_COUNT) {
+                    fprintf(stderr, "gate size, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", size, MAX_VAR_COUNT);
                     goto FAIL;
                 }
                 total_size = size + ((size_t)1 << size) + (temp_gate.kind == MULTIPLEXER ? 1 : 0);

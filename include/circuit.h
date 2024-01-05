@@ -29,7 +29,7 @@ typedef struct {
 #define INSERT_GATE_FAILURE 1
 //attempts to insert a variable into c
 //maximum length of name is defined by NAME_SIZE in variable.h
-//returns 0 on success or 1 on failure
+//returns 0 on success or INSERT_GATE_FAILURE on failure
 int insert_var(circuit* c, type_t type, char* name, bool value); 
 
 //Initialize an Empty Circuit

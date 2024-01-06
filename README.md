@@ -4,12 +4,12 @@ A simple reworking of a digital circuit truth table printout I did a year ago
 Mostly an exercise in doing some C before my OS Class. 
 
 # Folders
-- build contains all cmake related file and the project proper
-- include contains all relavent headers listed below
+- build contains all cmake related files and the project proper
+- include
   - circuit.h
   - gate.h
   - variable.h
-- src contains all relavent source files listed below
+- src
    - circuit.c
    - gate.c
    - variable.c
@@ -17,18 +17,20 @@ Mostly an exercise in doing some C before my OS Class.
 # Specifications
 Prints out a binary truth table of a circuit read in via a file.
 
-## Standard Circuit Declaraction
+## Standard Circuit Declaration
 
 INPUT must be the first word followed by n which determines the number of input variables.
 Following that is the declaration of the names of each input variable.
+
 Example:
 `INPUT 3 a b c`
+
 OUTPUT is declared in the same fashion and must follow after the last input variable was read.
 
-After that a number of gates and variables may be declared seperated by whitespace following the format.
+After that, a number of gates and variables may be declared separated by whitespace following the format.
 GATE parameters
 
-Where gate is a valid gate and parameters is a matching set of valid variables.
+Where GATE is a valid gate and parameters is a matching set of valid variable declarations.
 Example Program which computes z = ab + ac.
 ```
 INPUT 3 a b c
@@ -37,7 +39,6 @@ AND a b x
 AND a c y
 OR x y z
 ```
-
 
 
 ## Variable Types
@@ -59,26 +60,34 @@ It is set to 64 as a default.
 Each gate will be represented via i's and o's, where they represent input and output parameters respectively. Ellipses (...) are used to indicate a variable number of parameters whenever n is specified. Descriptions may refer to previous gates declared as a function with each parameter represented as an argument.
 
 - PASS i o
-Computes the identity gate where o = i 
+
+Computes the identity gate where o = i
+
 Needed for converting temporary variables into output parameters
 
 - NOT i o
+  
 Computes the inverse gate where o = ̅i
 
-- AND i~1~ i~2~ o
-Computes the logical *and* where o = i~1~i~2~.
+- AND i<sub>1</sub> i<sub>2</sub> o
+  
+Computes the logical *and* where o = i<sub>1</sub>i<sub>2</sub>.
 
-- NAND i~1~ i~2~ o
-Computes the logical *nand* where o = NOT(i~1~i~2~).
+- NAND i<sub>1</sub> i<sub>2</sub> o
 
-- OR i~1~ i~2~ o 
-Computes the logical *or* where o = i~1~ + i~2~.
+Computes the logical *nand* where o = NOT(i<sub>1</sub>i<sub>2</sub>).
 
-- NOR i~1~ i~2~ o 
-Computes the logical *nor* where o = NOT(i~1~ + i~2~)
+- OR i<sub>1</sub> i<sub>2</sub> o
+  
+Computes the logical *or* where o = i<sub>1</sub> + i<sub>2</sub>.
 
-- XOR i~1~ i~2~ o
-Computes the logical *xor* where o = i~1~ ⊕ i~2~, , where ⊕ indicates exclusive or
+- NOR i<sub>1</sub> i<sub>2</sub> o
+  
+Computes the logical *nor* where o = NOT(i<sub>1</sub> + i<sub>2</sub>)
+
+- XOR i<sub>1</sub> i<sub>2</sub> o
+  
+Computes the logical *xor* where o = i<sub>1</sub> ⊕ i<sub>2</sub>, , where ⊕ indicates exclusive or
 
 - DECODER n i~1~ · · ·i~n~ o~0~ · · · o~2^(n−1)~
 Computes a n : 2^n^ decoder gate in logic design. 

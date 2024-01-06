@@ -7,9 +7,7 @@
 #include "variable.h"
 #include "gate.h"
 
-/*
-* Circuit struct to hold information about gates and variables
-*/
+//Circuit struct to hold information about gates and variables
 typedef struct {
     gate* gates; //All Gates
     size_t gate_len; //Amount of circuits to run
@@ -26,10 +24,11 @@ typedef struct {
     size_t var_cap; //Capacity of variables* (used for realloc efficiency)
 } circuit;
 
+
 #define INSERT_GATE_FAILURE 1
-//attempts to insert a variable into c
-//maximum length of name is defined by NAME_SIZE in variable.h
-//returns 0 on success or INSERT_GATE_FAILURE on failure
+//Attempts to insert a variable into c
+//Maximum length of name is defined by NAME_SIZE in variable.h
+//Returns 0 on success or INSERT_GATE_FAILURE on failure
 int insert_var(circuit* c, type_t type, char* name, bool value); 
 
 //Initialize an Empty Circuit

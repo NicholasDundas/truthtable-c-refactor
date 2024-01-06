@@ -60,13 +60,12 @@ It is set to 64 as a default.
 Each gate will be represented via i's and o's, where they represent input and output parameters respectively. Ellipses (...) are used to indicate a variable number of parameters whenever n is specified. Descriptions may refer to previous gates declared as a function with each parameter represented as an argument.
 
 - PASS i o
-
-Computes the identity gate where o = i
+  - Computes the identity gate where o = i
 
 Needed for converting temporary variables into output parameters
 
 - NOT i o
-  Computes the inverse gate where o = ̅i
+  - Computes the inverse gate where o = ̅i
 
 - AND i<sub>1</sub> i<sub>2</sub> o
   - Computes the logical *and* where o = i<sub>1</sub>i<sub>2</sub>.
@@ -83,20 +82,20 @@ Needed for converting temporary variables into output parameters
 - XOR i<sub>1</sub> i<sub>2</sub> o
   - Computes the logical *xor* where o = i<sub>1</sub> ⊕ i<sub>2</sub>, , where ⊕ indicates exclusive or
 
-- DECODER n i~1~ · · ·i~n~ o~0~ · · · o~2^(n−1)~
+- DECODER n i~1~ · · ·i~n~ o~0~ · · · o<sub>2<sup>(n-1)</sup></sub>
   - Computes a n : 2<sup>n</sup> decoder gate in logic design. 
     The first argument gives the number of inputs, n. 
     The next n parameters are the inputs, followed by 2^n^ parameters indicating the outputs. 
     The inputs are interpreted as an n-bit binary number b in the range 0, · · · , 2<sup>(n − 1)</sup>, where i~1~ is the most significant bit and i~n~ is the least significant bit. 
-    The output o~b~ will be 1 and all others will be 0.
+    The output o<sub>b</sub> will be 1 and all others will be 0.
 
-- MULTIPLEXER n i~0~ · · ·i~2^(n−1)~ s~1~ · · ·s~n~ o
+- MULTIPLEXER n i~0~ · · ·i<sub>2<sup>(n − 1)</sup></sub> s<sub>1</sub> · · ·s<sub>n</sub> o
   - Computes a 2<sup>n</sup> : 1 multiplexer gate in logic design. 
     The inputs to a multiplexer are either regular inputs or selectors, indicated by i and s, respectively. 
     The first parameter, n, gives the number of selectors. 
-    The next 2^n^ parameters give the regular inputs, followed by n selector inputs, and finally the output. 
+    The next 2<sup>n</sup> parameters give the regular inputs, followed by n selector inputs, and finally the output. 
     The selector inputs are interpreted as an n-bit binary number s in the range 0, · · · , 2<sup>(n − 1)</sup>. 
-    The output is o = i~s~.
+    The output is o = i<sub>s</sub>.
 
 
 The maximum number for n is limited by the program to prevent overflow is defined by MAX_VAR_COUNT in truthtable.c. 

@@ -4,7 +4,7 @@ A simple reworking of a digital circuit truth table printout I did a year ago
 Mostly an exercise in doing some C before my OS Class. 
 
 # Folders
-- build contains all cmake related files and the project proper
+- build contains all cmake-related files and the project proper
 - include
   - circuit.h
   - gate.h
@@ -61,8 +61,7 @@ Each gate will be represented via i's and o's, where they represent input and ou
 
 - PASS i o
   - Computes the identity gate where o = i
-
-Needed for converting temporary variables into output parameters
+`Necessary for converting temporary variables into output parameters`
 
 - NOT i o
   - Computes the inverse gate where o = ̅i
@@ -82,7 +81,7 @@ Needed for converting temporary variables into output parameters
 - XOR i<sub>1</sub> i<sub>2</sub> o
   - Computes the logical *xor* where o = i<sub>1</sub> ⊕ i<sub>2</sub>, , where ⊕ indicates exclusive or
 
-- DECODER n i~1~ · · ·i~n~ o~0~ · · · o<sub>2<sup>(n-1)</sup></sub>
+- DECODER n i<sub>1</sub> · · ·i~n~ o<sub>0</sub> · · · o<sub>2<sup>(n-1)</sup></sub>
   - Computes a n : 2<sup>n</sup> decoder gate in logic design. 
     The first argument gives the number of inputs, n. 
     The next n parameters are the inputs, followed by 2^n^ parameters indicating the outputs. 
@@ -102,7 +101,7 @@ The maximum number for n is limited by the program to prevent overflow is define
 It is set to 32 by default.
 
 # Running the program
-To run the program is fairly simple just add the file you want to enter as the first argument such that running it looks like:
+To run the program is fairly simple just add the file you want to enter as the first argument such that running it looks like this:
 
 `.\truthtable.exe test.txt`
 
@@ -118,4 +117,4 @@ The example program above would have printed
 0 1 1 | 0 
 1 1 1 | 1
 ```
-Where the first numbers represnent the binary represntation of inputs followed by a pipe which then prints the resulting outputs.
+Where the first numbers represent the binary representation of inputs followed by a pipe which then prints the resulting outputs.

@@ -34,10 +34,9 @@ Example:
 
 OUTPUT is declared in the same fashion and must follow after the last input variable is read. 
 
-After that, a number of gates and variables may be declared separated by whitespace following the format.  
-GATE parameters  
-
+A number of gates and variables may follow, separated by whitespace following the format: `GATE parameters`   
 Where GATE is a valid gate and parameters is a matching set of valid variable declarations.  
+
 Example Program which computes z = ab + ac.
 ```
 INPUT 3 a b c

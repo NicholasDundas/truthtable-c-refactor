@@ -1,8 +1,21 @@
+/*
+* author: Nicholas Dundas
+* date: 1/5/2024
+* Truthtable program I have refactored from an older code made in my Sophmore year of College
+* Takes a file as the first argument and prints out a truth table.
+*
+* Simple usage
+* .\truthtable <FILE> 
+*
+*/
+
+
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+
 #include "circuit.h"
 #include "variable.h"
 

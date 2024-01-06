@@ -82,14 +82,14 @@ Each gate will be represented via i's and o's, where they represent input and ou
 - XOR i<sub>1</sub> i<sub>2</sub> o
   - Computes the logical *xor* where o = i<sub>1</sub> ⊕ i<sub>2</sub>, , where ⊕ indicates exclusive or
 
-- DECODER n i<sub>1</sub> · · ·i~n~ o<sub>0</sub> · · · o<sub>2<sup>(n-1)</sup></sub>
+- DECODER n i<sub>1</sub> · · ·i<sub>n</sub> o<sub>0</sub> · · · o<sub>2<sup>(n-1)</sup></sub>
   - Computes a n : 2<sup>n</sup> decoder gate in logic design. 
     The first argument gives the number of inputs, n. 
     The next n parameters are the inputs, followed by 2^n^ parameters indicating the outputs. 
-    The inputs are interpreted as an n-bit binary number b in the range 0, · · · , 2<sup>(n − 1)</sup>, where i~1~ is the most significant bit and i~n~ is the least significant bit. 
+    The inputs are interpreted as an n-bit binary number b in the range 0, · · · , 2<sup>(n − 1)</sup>, where i<sub>1</sub> is the most significant bit and i<sub>n</sub> is the least significant bit. 
     The output o<sub>b</sub> will be 1 and all others will be 0.
 
-- MULTIPLEXER n i~0~ · · ·i<sub>2<sup>(n − 1)</sup></sub> s<sub>1</sub> · · ·s<sub>n</sub> o
+- MULTIPLEXER n i<sub>0</sub> · · ·i<sub>2<sup>(n − 1)</sup></sub> s<sub>1</sub> · · ·s<sub>n</sub> o
   - Computes a 2<sup>n</sup> : 1 multiplexer gate in logic design. 
     The inputs to a multiplexer are either regular inputs or selectors, indicated by i and s, respectively. 
     The first parameter, n, gives the number of selectors. 

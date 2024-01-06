@@ -20,7 +20,9 @@ Mostly an exercise in doing some C before my OS Class.
   - CMakeLists.txt 
 
 # Specifications
-Prints out a binary truth table of a circuit read in via a file.
+
+Prints out a binary truth table of a circuit read in via a file.  
+Below are the various language features and a simple program to show you how to write your own.
 
 ## Standard Circuit Declaration
 

@@ -4,16 +4,20 @@ A simple reworking of a digital circuit truth table printout I did a year ago
 Mostly an exercise in doing some C before my OS Class. 
 
 # Folders
-- build
-  -  contains all cmake-related files and the project proper 
-- include
-  - circuit.h
-  - gate.h
-  - variable.h
-- src
-   - circuit.c
-   - gate.c
-   - variable.c
+- master
+  - build
+    -  all cmake-related config files
+    -  makefile
+    -  exe
+  - include
+    - circuit.h
+    - gate.h
+    - variable.h
+  - src
+     - circuit.c
+     - gate.c
+     - variable.c
+  - CMakeLists.txt 
 
 # Specifications
 Prints out a binary truth table of a circuit read in via a file.

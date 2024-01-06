@@ -83,17 +83,17 @@ Each gate will be represented via i's and o's, where they represent input and ou
   - Computes the logical *xor* where o = i<sub>1</sub> ⊕ i<sub>2</sub>, , where ⊕ indicates exclusive or
 
 - DECODER n i<sub>1</sub> · · ·i<sub>n</sub> o<sub>0</sub> · · · o<sub>2<sup>(n-1)</sup></sub>
-  - Computes a n : 2<sup>n</sup> decoder gate in logic design. 
-    The first argument gives the number of inputs, n. 
-    The next n parameters are the inputs, followed by 2^n^ parameters indicating the outputs. 
-    The inputs are interpreted as an n-bit binary number b in the range 0, · · · , 2<sup>(n − 1)</sup>, where i<sub>1</sub> is the most significant bit and i<sub>n</sub> is the least significant bit. 
+  - Computes a n : 2<sup>n</sup> decoder gate in logic design. \n
+    The first argument gives the number of inputs, n. \n
+    The next n parameters are the inputs, followed by 2^n^ parameters indicating the outputs. \n
+    The inputs are interpreted as an n-bit binary number b in the range 0, · · · , 2<sup>(n − 1)</sup>, where i<sub>1</sub> is the most significant bit and i<sub>n</sub> is the least significant bit. \n
     The output o<sub>b</sub> will be 1 and all others will be 0.
 
 - MULTIPLEXER n i<sub>0</sub> · · ·i<sub>2<sup>(n − 1)</sup></sub> s<sub>1</sub> · · ·s<sub>n</sub> o
-  - Computes a 2<sup>n</sup> : 1 multiplexer gate in logic design. 
-    The inputs to a multiplexer are either regular inputs or selectors, indicated by i and s, respectively. 
-    The first parameter, n, gives the number of selectors. 
-    The next 2<sup>n</sup> parameters give the regular inputs, followed by n selector inputs, and finally the output. 
+  - Computes a 2<sup>n</sup> : 1 multiplexer gate in logic design. \n
+    The inputs to a multiplexer are either regular inputs or selectors, indicated by i and s, respectively. \n
+    The first parameter, n, gives the number of selectors. \n
+    The next 2<sup>n</sup> parameters give the regular inputs, followed by n selector inputs, and finally the output. \n
     The selector inputs are interpreted as an n-bit binary number s in the range 0, · · · , 2<sup>(n − 1)</sup>. 
     The output is o = i<sub>s</sub>.
 

@@ -61,6 +61,7 @@ Each gate will be represented via i's and o's, where they represent input and ou
 
 - PASS i o
   - Computes the identity gate where o = i
+
 `Necessary for converting temporary variables into output parameters`
 
 - NOT i o

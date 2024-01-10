@@ -7,7 +7,9 @@ CMakeFiles/truthtable.dir/src/circuit.c.obj
  ../include/variable.h
  F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c
 CMakeFiles/truthtable.dir/src/gate.c.obj
+ ../include/circuit.h
  ../include/gate.h
+ ../include/variable.h
  F:/Coding Projects/C/truthtable_c_refactor/src/gate.c
 CMakeFiles/truthtable.dir/src/truthtable.c.obj
  ../include/circuit.h

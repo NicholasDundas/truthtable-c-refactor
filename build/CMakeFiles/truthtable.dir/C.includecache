@@ -21,11 +21,17 @@ stdbool.h
 -
 stdlib.h
 -
+stdio.h
+-
+variable.h
+../include/variable.h
 
 ../include/variable.h
 stdbool.h
 -
 stdlib.h
+-
+stdio.h
 -
 
 F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c
@@ -43,32 +49,4 @@ variable.h
 F:/Coding Projects/C/truthtable_c_refactor/src/variable.h
 gate.h
 F:/Coding Projects/C/truthtable_c_refactor/src/gate.h
-
-F:/Coding Projects/C/truthtable_c_refactor/src/gate.c
-gate.h
-F:/Coding Projects/C/truthtable_c_refactor/src/gate.h
-stdlib.h
--
-stdbool.h
--
-stdio.h
--
-
-F:/Coding Projects/C/truthtable_c_refactor/src/truthtable.c
-stdlib.h
--
-stdio.h
--
-string.h
--
-stdbool.h
--
-circuit.h
-F:/Coding Projects/C/truthtable_c_refactor/src/circuit.h
-variable.h
-F:/Coding Projects/C/truthtable_c_refactor/src/variable.h
-
-F:/Coding Projects/C/truthtable_c_refactor/src/variable.c
-variable.h
-F:/Coding Projects/C/truthtable_c_refactor/src/variable.h
 

@@ -2,7 +2,14 @@
     "cmake.configureOnOpen": true,
     "cmake.debugConfig": {
         "args": [
-            "test.txt", 
+            "test.1.01.txt", 
         ]
+    },
+    "files.associations": {
+        "stdio.h": "c",
+        "stdbool.h": "c",
+        "type_traits": "c",
+        "stdlib.h": "c",
+        "gate.h": "c"
     },
 }

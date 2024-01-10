@@ -7,6 +7,11 @@
 #include "variable.h"
 #include "gate.h"
 
+#define MAX_VAR_COUNT (size_t)32
+
+//Defines the array index where input variables begin
+#define CIRCUIT_CONST_OFFSET (size_t)3
+
 //Circuit struct to hold information about gates and variables
 typedef struct {
     gate* gates; //All Gates
@@ -19,9 +24,9 @@ typedef struct {
     - Then Outputs declared on the next
     - Then Temporary Variables declared as needed
     */
-    variable* variables; 
-    size_t var_len; //Variable length
+    variable* variables;
     size_t var_cap; //Capacity of variables* (used for realloc efficiency)
+    size_t var_len; //Variable length
 } circuit;
 
 
@@ -43,9 +48,29 @@ void free_circuit(circuit* cir);
 //Returns var_len of circuit on failure or GET_VAR_NULL_PASSED if a null was passed to either parameter
 size_t get_var(circuit* c, char* name); 
 
+//converts kind_t to char
+const char* gate_type_to_char(kind_t type);
 
 #define INSERT_VAR_FAILURE 1
 //attempts to add gate type of kind to c and returns 0 on success or 1 on failure
 //size and params must match with gate type or UB will occur
-int insert_gate(circuit* c, kind_t kind, bool** params, size_t size); 
+int insert_gate(circuit* c, kind_t kind, size_t* params, size_t size, size_t total_size); 
+
+typedef enum { GATE_RUN_SUCCESS, INVALID_GATE_PASSED, NULL_GATE_PASSED  } gate_return_err;
+
+//Preforms gate action on the gate pointed. returns the result 
+gate_return_err gate_return(circuit* cir,gate* g);
+
+//debug print
+void print_circuit(FILE* file,circuit* cir);
+
+//Debug printing of a gate
+//Example:
+//GATE: AND
+//  INPUT
+//  - [NAME: Variable1, true (0xA421F412), INPUT]
+//  - [NAME: Variable2, false (0xA421F412), INPUT]
+//  OUTPUT
+//  - [NAME: Variable3, false (0xA421F412), OUTPUT]
+void print_gate(FILE* file,circuit* cir ,gate* g);
 #endif

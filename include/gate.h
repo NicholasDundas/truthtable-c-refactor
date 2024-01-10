@@ -3,6 +3,9 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+#include "variable.h"
 
 
 typedef enum { AND, OR, NAND, NOR, XOR, NOT, PASS, DECODER, MULTIPLEXER } kind_t; //Defines the types of gates
@@ -30,16 +33,18 @@ typedef enum { AND, OR, NAND, NOR, XOR, NOT, PASS, DECODER, MULTIPLEXER } kind_t
 // MULTIPLEXER
 //
 typedef struct {
-    kind_t kind;
-    size_t size; // indicates size of DECODER and MULTIPLEXER
-    bool** params; // length determined by kind and size;
+    kind_t kind; //type of gate
+    size_t size; // indicates size of inputs
+    size_t total_size; //total size of params
+    size_t* params; // length determined by kind and size;
     // includes inputs and outputs, indicated by variable numbers
 } gate;
 
 
-typedef enum { GATE_RUN_SUCCESS, INVALID_GATE_PASSED, NULL_GATE_PASSED  } gate_return_result;
 
-//Preforms gate action on the gate pointed. returns the result 
-gate_return_result gate_return(gate* g);
 
+
+
+
+const char* gate_type_to_char(kind_t type);
 #endif

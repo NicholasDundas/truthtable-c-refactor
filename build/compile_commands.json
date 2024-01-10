@@ -1,22 +1,22 @@
 [
 {
   "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Wpedantic -Werror -g   -o CMakeFiles\\truthtable.dir\\src\\circuit.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\circuit.c\"",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Werror -Wpedantic -std=c11 -g   -o CMakeFiles\\truthtable.dir\\src\\circuit.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\circuit.c\"",
   "file": "F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c"
 },
 {
   "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Wpedantic -Werror -g   -o CMakeFiles\\truthtable.dir\\src\\gate.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\gate.c\"",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Werror -Wpedantic -std=c11 -g   -o CMakeFiles\\truthtable.dir\\src\\gate.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\gate.c\"",
   "file": "F:/Coding Projects/C/truthtable_c_refactor/src/gate.c"
 },
 {
   "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Wpedantic -Werror -g   -o CMakeFiles\\truthtable.dir\\src\\truthtable.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\truthtable.c\"",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Werror -Wpedantic -std=c11 -g   -o CMakeFiles\\truthtable.dir\\src\\truthtable.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\truthtable.c\"",
   "file": "F:/Coding Projects/C/truthtable_c_refactor/src/truthtable.c"
 },
 {
   "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Wpedantic -Werror -g   -o CMakeFiles\\truthtable.dir\\src\\variable.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\variable.c\"",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Werror -Wpedantic -std=c11 -g   -o CMakeFiles\\truthtable.dir\\src\\variable.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\variable.c\"",
   "file": "F:/Coding Projects/C/truthtable_c_refactor/src/variable.c"
 }
 ]

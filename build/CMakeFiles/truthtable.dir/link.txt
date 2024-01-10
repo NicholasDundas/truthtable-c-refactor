@@ -1,3 +1,3 @@
 "C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\truthtable.dir/objects.a
 C:\msys64\ucrt64\bin\ar.exe cr CMakeFiles\truthtable.dir/objects.a @CMakeFiles\truthtable.dir\objects1.rsp
-C:\msys64\ucrt64\bin\gcc.exe -Wall -Wextra -Wpedantic -Werror -g   -Wl,--whole-archive CMakeFiles\truthtable.dir/objects.a -Wl,--no-whole-archive  -o truthtable.exe -Wl,--out-implib,libtruthtable.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\truthtable.dir\linklibs.rsp
+C:\msys64\ucrt64\bin\gcc.exe -Wall -Wextra -Werror -Wpedantic -std=c11 -g   -Wl,--whole-archive CMakeFiles\truthtable.dir/objects.a -Wl,--no-whole-archive  -o truthtable.exe -Wl,--out-implib,libtruthtable.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\truthtable.dir\linklibs.rsp

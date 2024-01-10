@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 //Maximum length of name of a variable including null terminator
 #define NAME_SIZE (size_t)64 
@@ -23,4 +24,16 @@ bool output_friendly(variable v);
 //returns whether a value is INPUT, CONST, or TEMP
 bool input_friendly(variable v);
 
+//Debug print
+//Example:
+//[NAME: John, true (0xA421F412), INPUT]
+void print_var(FILE* file,variable* v);
+
+//Debug print
+//Example:
+//[true (0xA421F412)]
+void print_bool(FILE* file,bool* v);
+
+//converts type_t to a string
+const char* variable_type_to_char(type_t type);
 #endif

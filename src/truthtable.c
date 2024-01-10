@@ -20,9 +20,6 @@
 #include "variable.h"
 
 
-#define MAX_VAR_COUNT (size_t)32
-
-
 //reads into buffer and exits if fails
 int readbuf(FILE* file,void* buf,char* format,char* errmsg) { 
     int readerr = fscanf(file, format, buf);
@@ -33,28 +30,27 @@ int readbuf(FILE* file,void* buf,char* format,char* errmsg) {
     return readerr;
 }
 
-
 //Errors READ_VAR can throw
-typedef enum { TEMP_DOESNT_EXIST, OUTPUT_EXPECTED_ERROR, INPUT_EXPECTED_ERROR ,UNKNOWN_ERROR } READ_VAR_FAIL;
+typedef enum { TEMP_DOESNT_EXIST = 1, OUTPUT_EXPECTED_ERROR, INPUT_EXPECTED_ERROR ,UNKNOWN_ERROR } READ_VAR_FAIL;
 
 //variable reading helper function
-int read_var(FILE* finput, circuit* cir, char* buf,char* format,size_t i,size_t output_cap, bool** value) { 
+int read_var(FILE* finput, circuit* cir, char* buf,char* format,size_t i,size_t output_cap, size_t* value) { 
     readbuf(finput, buf, format, "variable name read fail");
     size_t index = get_var(cir, buf);
     //If it doesnt exist (and we need outputs), create it!
     if (index == cir->var_len && i >= output_cap) {
         insert_var(cir, TEMP, buf,false);
-        *value = cir->variables[cir->var_len - 1].value;
+        *value = cir->var_len - 1;
         return 0;
     }
     //Must read in an input, const, or temp as an input before the index i reaches output_cap, in which it will only accept const_out, temp, and OUTPUT
     else if (index != cir->var_len && //Make sure we found something before...
         ((i >= output_cap && output_friendly(cir->variables[index])) //Are we expecting output?
         || (i < output_cap && input_friendly(cir->variables[index])))) { //Are we expecting input?
-            *value = cir->variables[index].value;
+            *value = index;
             return 0;
     }
-    *value = NULL;
+    *value = SIZE_MAX;
     if (i < output_cap)
         return TEMP_DOESNT_EXIST;
     if (i >= output_cap && input_friendly(cir->variables[index]))
@@ -73,6 +69,7 @@ int main(int argc, char** argv) {
     FILE* finput = fopen(argv[1], "r");
     if (finput == NULL) {
         fprintf(stderr, "error opening file, \"%s\": %s",argv[1] ,strerror(errno));
+        goto FAIL;
     }
 
     //contains "%(NAME_SIZE)s" where (NAME_SIZE) is a macro defined in variable.h inserted via snprintf
@@ -140,7 +137,7 @@ int main(int argc, char** argv) {
     //Read in circuit
     int read_result = EOF;
     while ((read_result = fscanf(finput, nameformat, buf)) == 1) {
-        gate temp_gate = {.kind = 0, .params = NULL, .size = 0};
+        gate temp_gate = {.kind = 0, .params = NULL, .size = 0, .total_size = 0};
         if (strncmp(buf, "NOT", 3) == 0) temp_gate.kind = NOT;
         else if (strncmp(buf, "PASS", 4) == 0) temp_gate.kind = PASS;
         else if (strncmp(buf, "AND", 3) == 0) temp_gate.kind = AND;
@@ -154,7 +151,7 @@ int main(int argc, char** argv) {
             fprintf(stderr, "Unknown gate type : %s", buf);
             goto FAIL;
         }
-        size_t size = 2, total_size; //Size of params (includes all inputs, outputs, selectors, etc)
+        temp_gate.size = 1; temp_gate.total_size = 2; //Size of params (includes all inputs, outputs, selectors, etc)
         size_t output_cap = 1; //Index of where outputs may start
         switch (temp_gate.kind) {
             case AND:
@@ -162,81 +159,92 @@ int main(int argc, char** argv) {
             case NAND:
             case NOR:
             case XOR:
-                size = 3; //2 inputs [0,1,...], 1 output.... [...,2]
+                temp_gate.size = 2;
+                temp_gate.total_size = 3; //2 inputs params[0,1,...], 1 output.... params[...,2]
                 output_cap = 2;
                 __attribute__ ((fallthrough));
             case NOT:
             case PASS:
-                total_size = size;
                 break;
             case DECODER:
             case MULTIPLEXER:
-                readbuf(finput, &size, "%zu", "error reading gate variable N count");
-                if (size > MAX_VAR_COUNT) {
-                    fprintf(stderr, "gate size, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", size, MAX_VAR_COUNT);
+                readbuf(finput, &temp_gate.size, "%zu", "error reading gate variable N count");
+                if (temp_gate.size > MAX_VAR_COUNT) {
+                    fprintf(stderr, "gate size, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", temp_gate.size, MAX_VAR_COUNT);
                     goto FAIL;
                 }
-                total_size = size + ((size_t)1 << size) + (temp_gate.kind == MULTIPLEXER ? 1 : 0);
-                output_cap = size + (temp_gate.kind == MULTIPLEXER ? ((size_t)1 << size) : 0);
+                temp_gate.total_size = temp_gate.size + ((size_t)1 << temp_gate.size) + (temp_gate.kind == MULTIPLEXER ? 1 : 0);
+                output_cap = temp_gate.size + (temp_gate.kind == MULTIPLEXER ? ((size_t)1 << temp_gate.size) : 0);
                 break;
         }
-        temp_gate.params = malloc(sizeof(bool*) * total_size);
-        for (size_t i = 0; i < size; ++i) {
-            READ_VAR_FAIL res = read_var(finput, cir, buf, nameformat, i, output_cap,&temp_gate.params[i]);
-            if (temp_gate.params[i] == NULL) {
-                if (res == TEMP_DOESNT_EXIST) {
-                    fprintf(stderr, "could not read in variable as \"%s\" has not been declared as an output before\n", buf);
-                    goto FAIL;
-                } else if (res == INPUT_EXPECTED_ERROR) {
-                    fprintf(stderr, "could not read in variable as  \"%s\" is not of type CONST, INPUT, or TEMP\n", buf);
-                    goto FAIL;
-                } else if (res == OUTPUT_EXPECTED_ERROR) {
-                    fprintf(stderr, "could not read in variable as  \"%s\" is not of type DISCARD, OUTPUT, or TEMP\n", buf);
-                    goto FAIL;
-                } else if (res == UNKNOWN_ERROR) {
-                    fprintf(stderr, "could not read in variable : %s\n", buf);
-                    goto FAIL;
+        temp_gate.params = malloc(sizeof(size_t*) * temp_gate.total_size);
+        for (size_t i = 0; i < temp_gate.total_size; ++i) {
+            READ_VAR_FAIL res = read_var(finput,cir,buf,nameformat,i,output_cap, &temp_gate.params[i]);
+            if (temp_gate.params[i] == SIZE_MAX) {
+                switch (res) {
+                    case TEMP_DOESNT_EXIST:
+                        fprintf(stderr, "could not read in variable as \"%s\" has not been declared as an output before\n", buf);
+                        break;
+                    case INPUT_EXPECTED_ERROR:
+                        fprintf(stderr, "could not read in variable as  \"%s\" is not of type CONST, INPUT, or TEMP\n", buf);
+                        break;
+                    case OUTPUT_EXPECTED_ERROR:
+                        fprintf(stderr, "could not read in variable as  \"%s\" is not of type DISCARD, OUTPUT, or TEMP\n", buf);
+                        break;
+                    case UNKNOWN_ERROR: 
+                    default:
+                        fprintf(stderr, "could not read in variable : %s\n", buf);
+                        break;               
                 }
+                goto FAIL;
             }
         }
-        insert_gate(cir, temp_gate.kind, temp_gate.params, size);       
+        insert_gate(cir, temp_gate.kind, temp_gate.params, temp_gate.size, temp_gate.total_size);       
     }
     if (read_result != EOF) {
         fprintf(stderr, "error reading gates, buf = \"%s\"\n%s",buf,strerror(errno));
         goto FAIL;
     }
     fclose(finput);
-
-    const size_t constant_offset = 3; //Offsets us from the first 3 variables
+    FILE* output = stdout;
+    print_circuit(output,cir);
+    if(output != stderr && output != stdout)
+        fclose(output);
     for (size_t i = 0; i < (size_t)1 << input_len; i++) {
         //Setting Inputs to an increasing Number i
         size_t num = i;
-        for (size_t k = 0; k < input_len; k++) {
-            *cir->variables[k + constant_offset].value = num & 1;
+        for (size_t k = input_len - 1; k != SIZE_MAX; k--) {
+            *cir->variables[k + CIRCUIT_CONST_OFFSET].value = num & 1;
             num >>= 1;
         }
 
         //Preforming Gate Actions
         for (size_t c = 0; c < cir->gate_len; c++) {
-            if (gate_return(&(cir->gates[c])) != 0) {
+            if (gate_return(cir,&(cir->gates[c])) != 0) {
                 fprintf(stderr, "Invalid gate attempted run, %d", cir->gates[c].kind);
                 goto FAIL;
             }
         }
 
         //Printing Current State
+        if(output == NULL) {
+            goto FAIL;
+        } 
         for (size_t k = 0; k < input_len; ++k) {
-            printf("%d ", *cir->variables[k + constant_offset].value);
+            fprintf(output,"%d ", *cir->variables[k + CIRCUIT_CONST_OFFSET].value);
         }
-        printf("|");
+        fprintf(output,"|");
         for (size_t k = input_len; k < input_len + output_len; k++) {
-            printf(" %d", *cir->variables[k + constant_offset].value);
+            fprintf(output," %d", *cir->variables[k + CIRCUIT_CONST_OFFSET].value);
         }
-        printf("\n");
+        fprintf(output,"\n");
     }
+    fprintf(output,"\n\n");
     free_circuit(cir);
     return EXIT_SUCCESS;
 
-FAIL: //Failstate
+FAIL: //Failstate exits and returns 1
+    free_circuit(cir);
     return EXIT_FAILURE;
+
 }

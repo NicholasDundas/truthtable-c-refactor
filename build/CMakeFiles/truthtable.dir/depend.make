@@ -6,7 +6,9 @@ CMakeFiles/truthtable.dir/src/circuit.c.obj: ../include/gate.h
 CMakeFiles/truthtable.dir/src/circuit.c.obj: ../include/variable.h
 CMakeFiles/truthtable.dir/src/circuit.c.obj: ../src/circuit.c
 
+CMakeFiles/truthtable.dir/src/gate.c.obj: ../include/circuit.h
 CMakeFiles/truthtable.dir/src/gate.c.obj: ../include/gate.h
+CMakeFiles/truthtable.dir/src/gate.c.obj: ../include/variable.h
 CMakeFiles/truthtable.dir/src/gate.c.obj: ../src/gate.c
 
 CMakeFiles/truthtable.dir/src/truthtable.c.obj: ../include/circuit.h

@@ -58,7 +58,7 @@ There are five types of variables. Input, Output, Temporary Variables, Constants
 - Discard Variables may only be used as output and their result is effectively ignored
   - The name "_" is set aside to be used for discard variables. 
 
-The maximum size of a variable name is determined by NAME_SIZE defined in variable.h
+The maximum size of a variable name is determined by NAME_SIZE defined in *variable.h*  
 It is set to 64 as a default.
 
 ## Gate Types
@@ -104,7 +104,7 @@ Each gate will be represented via i's and o's, where they represent input and ou
     The output is o = i<sub>s</sub>.
 
 
-The maximum number for n is limited by the program to prevent overflow is defined by MAX_VAR_COUNT in truthtable.c.  
+The maximum number for n is limited by the program to prevent overflow is defined by MAX_VAR_COUNT in *truthtable.c*.  
 It is set to 32 by default.
 
 # Running the program

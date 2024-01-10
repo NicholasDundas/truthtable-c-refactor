@@ -40,11 +40,5 @@ typedef struct {
     // includes inputs and outputs, indicated by variable numbers
 } gate;
 
-
-
-
-
-
-
 const char* gate_type_to_char(kind_t type);
 #endif

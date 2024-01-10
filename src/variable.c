@@ -1,7 +1,7 @@
 #include "variable.h"
 
 bool output_friendly(variable v) {
-    return (v.type == OUTPUT || v.type == CONST_OUT || v.type == TEMP);
+    return (v.type == OUTPUT || v.type == DISCARD || v.type == TEMP);
 }
 
 bool input_friendly(variable v) {
@@ -17,8 +17,8 @@ const char* variable_type_to_char(type_t type) {
             return "OUTPUT";
         case TEMP:   
             return "TEMP";
-        case CONST_OUT:
-            return "CONST_OUT";
+        case DISCARD:
+            return "DISCARD";
         case CONST:
             return "CONST";
         default:

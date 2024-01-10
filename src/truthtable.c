@@ -15,27 +15,114 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "circuit.h"
 #include "variable.h"
 
 
 //reads into buffer and exits if fails
-int readbuf(FILE* file,void* buf,char* format,char* errmsg) { 
+/*int readbuf(FILE* file,void* buf,char* format,char* errmsg) { 
     int readerr = fscanf(file, format, buf);
     if (readerr <= 0) {
         perror(errmsg);
         exit(EXIT_FAILURE);
     }
     return readerr;
+}*/
+
+typedef struct {
+    size_t line;
+    size_t pos;
+} parse_helper;
+
+parse_helper* init_ph() {
+    parse_helper* tmp = malloc(sizeof(parse_helper));
+    tmp->line = 1;
+    tmp->pos = 1;
+    return tmp;
+}
+
+//attempts to read a buffer into a string
+//limited by maxchr and increments the parse_helper to keep track of line and current character
+int readbuf_string(FILE* file,char* buf,size_t maxchr,const char* errmsg, parse_helper* ph) { 
+    int c;
+    while((c = fgetc(file)) != EOF && isspace(c)) { //remove preceding whitespace
+        if(c != '\n')
+            ++ph->pos;
+        else {
+            ++ph->line;
+            ph->pos = 1;
+        }
+    }
+    size_t count = 0;
+    if(c != EOF) {
+        buf[0] =  c;
+        count = 1;
+    }
+    while(count < maxchr && (c = fgetc(file)) != EOF && isalnum(c)) {
+        ++ph->pos;
+        buf[count++] = c;
+    }
+    buf[count] = '\0';
+    if(c == '\n') {
+            ++ph->line;
+            ph->pos = 1;
+    }        
+    if (count >= maxchr) {
+        fprintf(stderr,"ERROR: %s\nBUFFER:%s\nLINE:%zu\nPOSITION:%zu\n",errmsg,buf,ph->line,ph->pos);
+        exit(EXIT_FAILURE);
+    }
+    if(c == EOF)
+        return -1;
+    return 1;
+}
+
+int readbuf_uint(FILE* file,size_t* pnum,size_t maxchr,const char* errmsg, parse_helper* ph) { 
+    int c;
+    int num = 0;
+    while((c = fgetc(file)) != EOF && isspace(c)) { //remove preceding whitespace
+        if(c != '\n')
+            ++ph->pos;
+            else {
+                ++ph->line;
+                ph->pos = 1;
+            }
+    }
+    size_t count = 0;
+    bool flip = false;
+    if(c != EOF && c == '-')
+        flip = true;
+    else if (c != EOF) {
+        ++ph->pos;
+        num = (num * 10) + c - '0';
+    }
+    while(count < maxchr && (c = fgetc(file)) != EOF && isdigit(c)) {
+             flip = true;
+        num = (num * 10) + c - '0';
+        ++ph->pos;
+        ++count;
+    }
+    if(c == '\n') {
+        ++ph->line;
+        ph->pos = 1;
+    }    
+    if (c != EOF && (flip || !isspace(c))) {
+        fprintf(stderr,"ERROR: %s\nNUM:%d\nLINE:%zu\nPOSITION:%zu\n",errmsg,num,ph->line,ph->pos);
+        exit(EXIT_FAILURE);
+    }
+    *pnum = num;
+    if(c == EOF)
+        return -1;
+    return 1;
 }
 
 //Errors READ_VAR can throw
 typedef enum { TEMP_DOESNT_EXIST = 1, OUTPUT_EXPECTED_ERROR, INPUT_EXPECTED_ERROR ,UNKNOWN_ERROR } READ_VAR_FAIL;
 
 //variable reading helper function
-int read_var(FILE* finput, circuit* cir, char* buf,char* format,size_t i,size_t output_cap, size_t* value) { 
-    readbuf(finput, buf, format, "variable name read fail");
+int read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t output_cap, size_t* value,parse_helper* ph) { 
+    readbuf_string(finput, buf, NAME_SIZE, "variable name read fail",ph);
     size_t index = get_var(cir, buf);
     //If it doesnt exist (and we need outputs), create it!
     if (index == cir->var_len && i >= output_cap) {
@@ -72,25 +159,23 @@ int main(int argc, char** argv) {
         goto FAIL;
     }
 
-    //contains "%(NAME_SIZE)s" where (NAME_SIZE) is a macro defined in variable.h inserted via snprintf
-    char nameformat[16];
-    snprintf(nameformat, sizeof(nameformat), "%%%zus", NAME_SIZE);
 
     circuit* cir = init_circuit();
+    parse_helper* ph = init_ph();
 
     size_t input_len = 0, output_len = 0, index = GET_VAR_NULL_PASSED;
 
     char* buf = malloc((NAME_SIZE + 1) * sizeof(char));
 
-    readbuf(finput, buf, nameformat, "error reading \"INPUT\" from file");
+    readbuf_string(finput, buf, NAME_SIZE, "error reading \"INPUT\" from file",ph);
     if (strncmp(buf, "INPUT", 5) == 0) {
-        readbuf(finput, &input_len, "%zu", "error reading variable N count from file");
+        readbuf_uint(finput, &input_len, NAME_SIZE, "could not read amount of input variables",ph);
         if (input_len > MAX_VAR_COUNT) {
-            fprintf(stderr, "count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", input_len, MAX_VAR_COUNT);
+            fprintf(stderr, "ERROR: count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"\nLINE:%zu\nPOSITION:%zu", input_len, MAX_VAR_COUNT,ph->line,ph->pos);
             goto FAIL;
         }
         for (size_t i = 0; i < input_len; i++) {
-            readbuf(finput, buf, nameformat, "input value name read fail");
+            readbuf_string(finput, buf, NAME_SIZE, "input value name read fail",ph);
             if ((index = get_var(cir, buf)) == cir->var_len)
                 insert_var(cir, INPUT, buf, false);
             else if (index < cir->var_len) {
@@ -108,15 +193,15 @@ int main(int argc, char** argv) {
         goto FAIL;
     }
 
-    readbuf(finput, buf, nameformat, "error reading \"OUTPUT\" from file");
+    readbuf_string(finput, buf, NAME_SIZE, "error reading \"OUTPUT\" from file",ph);
     if (strncmp(buf, "OUTPUT", 6) == 0) {
-        readbuf(finput, &output_len, "%zu", "error reading variable N count from file");
+        readbuf_uint(finput, &output_len, NAME_SIZE, "could not read amount of output variables",ph);
         if (output_len > MAX_VAR_COUNT) {
             fprintf(stderr, "count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", output_len, MAX_VAR_COUNT);
             goto FAIL;
         }
         for (size_t i = 0; i < output_len; i++) {
-            readbuf(finput, buf, nameformat, "output value name read fail");
+            readbuf_string(finput, buf, NAME_SIZE, "output value name read fail",ph);
             if ((index = get_var(cir, buf)) == cir->var_len)
                 insert_var(cir, OUTPUT, buf,false);
             else if (index < cir->var_len) {
@@ -135,8 +220,8 @@ int main(int argc, char** argv) {
 
 
     //Read in circuit
-    int read_result = EOF;
-    while ((read_result = fscanf(finput, nameformat, buf)) == 1) {
+    int read_result = 1;
+    while ((read_result = readbuf_string(finput, buf, NAME_SIZE,"gate identifier error",ph)) == 1) {
         gate temp_gate = {.kind = 0, .params = NULL, .size = 0, .total_size = 0};
         if (strncmp(buf, "NOT", 3) == 0) temp_gate.kind = NOT;
         else if (strncmp(buf, "PASS", 4) == 0) temp_gate.kind = PASS;
@@ -168,7 +253,7 @@ int main(int argc, char** argv) {
                 break;
             case DECODER:
             case MULTIPLEXER:
-                readbuf(finput, &temp_gate.size, "%zu", "error reading gate variable N count");
+                readbuf_uint(finput, &temp_gate.size, NAME_SIZE, "error reading gate variable N count",ph);
                 if (temp_gate.size > MAX_VAR_COUNT) {
                     fprintf(stderr, "gate size, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", temp_gate.size, MAX_VAR_COUNT);
                     goto FAIL;
@@ -179,7 +264,7 @@ int main(int argc, char** argv) {
         }
         temp_gate.params = malloc(sizeof(size_t*) * temp_gate.total_size);
         for (size_t i = 0; i < temp_gate.total_size; ++i) {
-            READ_VAR_FAIL res = read_var(finput,cir,buf,nameformat,i,output_cap, &temp_gate.params[i]);
+            READ_VAR_FAIL res = read_var(finput,cir,buf,i,output_cap, &temp_gate.params[i],ph);
             if (temp_gate.params[i] == SIZE_MAX) {
                 switch (res) {
                     case TEMP_DOESNT_EXIST:
@@ -207,9 +292,6 @@ int main(int argc, char** argv) {
     }
     fclose(finput);
     FILE* output = stdout;
-    print_circuit(output,cir);
-    if(output != stderr && output != stdout)
-        fclose(output);
     for (size_t i = 0; i < (size_t)1 << input_len; i++) {
         //Setting Inputs to an increasing Number i
         size_t num = i;
@@ -240,6 +322,9 @@ int main(int argc, char** argv) {
         fprintf(output,"\n");
     }
     fprintf(output,"\n\n");
+    print_circuit(output,cir);
+    if(output != stderr && output != stdout)
+        fclose(output);
     free_circuit(cir);
     return EXIT_SUCCESS;
 

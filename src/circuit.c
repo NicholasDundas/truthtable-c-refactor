@@ -47,7 +47,7 @@ circuit* init_circuit(void) {
         //Inserting Constants into Circuit
         insert_var(cir, CONST, "0", false);
         insert_var(cir, CONST, "1", true);
-        insert_var(cir, CONST_OUT, "_", false);
+        insert_var(cir, DISCARD, "_", false);
     }
     return cir;
 }
@@ -157,6 +157,7 @@ void print_gate(FILE* file,circuit* cir,gate* g) {
         }            
         fprintf(file, "\n      OUTPUT");
         if(g->kind != DECODER) {
+            fprintf(file, "\n       ");
             print_var(file, &cir->variables[g->params[i]]);
         } else {
             for(; i < g->total_size; ++i) {
@@ -166,7 +167,7 @@ void print_gate(FILE* file,circuit* cir,gate* g) {
         }
     } else {
         for(i = 0; i < ((size_t)1 << g->size); ++i) {
-            fprintf(file, "       ");
+            fprintf(file, "\n       ");
             print_var(file, &cir->variables[g->params[i]]);
             fprintf(file, "\n");
         }

@@ -13,6 +13,7 @@ file(GLOB all_SRCS
         "${PROJECT_SOURCE_DIR}/include/*.h"
         "${PROJECT_SOURCE_DIR}/src/*.c"
         )
+
 add_executable(truthtable ${all_SRCS})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

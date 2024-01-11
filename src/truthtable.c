@@ -34,87 +34,92 @@
 typedef struct {
     size_t line;
     size_t pos;
+    size_t lastword_pos; //points to the last letter after a word
 } parse_helper;
 
 parse_helper* init_ph() {
     parse_helper* tmp = malloc(sizeof(parse_helper));
     tmp->line = 1;
     tmp->pos = 1;
+    tmp->lastword_pos = tmp->pos;
     return tmp;
 }
 
-//attempts to read a buffer into a string
-//limited by maxchr and increments the parse_helper to keep track of line and current character
-int readbuf_string(FILE* file,char* buf,size_t maxchr,const char* errmsg, parse_helper* ph) { 
-    int c;
-    while((c = fgetc(file)) != EOF && isspace(c)) { //remove preceding whitespace
-        if(c != '\n')
-            ++ph->pos;
-        else {
-            ++ph->line;
-            ph->pos = 1;
-        }
-    }
-    size_t count = 0;
-    if(c != EOF) {
-        buf[0] =  c;
-        count = 1;
-    }
-    while(count < maxchr && (c = fgetc(file)) != EOF && isalnum(c)) {
-        ++ph->pos;
-        buf[count++] = c;
-    }
-    buf[count] = '\0';
+//simple fgetc wrapper to increment ph as needed
+//lines is increased for every '\n' and pos is set back to zero
+//else pos is incremented by 1
+//returns -1 on EOF otherwise returns character
+int ph_get(FILE* file, parse_helper* ph) {
+    int c = fgetc(file);
+    if(c == EOF)
+        return EOF;
     if(c == '\n') {
-            ++ph->line;
-            ph->pos = 1;
-    }        
+        ph->line++;
+        ph->pos = 1;
+    } else {
+        ph->pos++;
+        if(c != ' ')
+            ph->lastword_pos = ph->pos;
+    }
+    return c;
+}
+
+
+//attempts to read a string from file into a buffer
+//limited by maxchr and increments the parse_helper to keep track of line and current character
+//assumes buffer is large enough to handle the string
+//returns -1 if read EOF or 1 on success
+int readbuf_string(FILE* file,char* buf,size_t maxchr,parse_helper* ph) { 
+    int c;
+    size_t count = 0;
+
+    while(isspace(c = ph_get(file,ph))); //remove preceding whitespace
+    if(c == EOF) return EOF;
+    
+    while(count < maxchr && (buf[count++] = c, !isspace(c = ph_get(file,ph)) && isprint(c)));
+    buf[count] = '\0';
+
+    if(c == EOF) return EOF;
     if (count >= maxchr) {
-        fprintf(stderr,"ERROR: %s\nBUFFER:%s\nLINE:%zu\nPOSITION:%zu\n",errmsg,buf,ph->line,ph->pos);
+        fprintf(stderr,"ERROR: Input Buffer overflow (MAX ALLOWED: %zu)\nBUFFER:\"%s\"\nLINE:%zu\nPOSITION:%zu\n",maxchr,buf,ph->line,ph->lastword_pos - count);
         exit(EXIT_FAILURE);
     }
-    if(c == EOF)
-        return -1;
     return 1;
 }
 
-int readbuf_uint(FILE* file,size_t* pnum,size_t maxchr,const char* errmsg, parse_helper* ph) { 
+bool isvalid_ull(char* buf) {
+    char* ptr = buf;
+    while(isdigit(*ptr))
+        ptr++;
+    if(*ptr == '\0')
+        return 1;
+    return 0;
+}
+
+int readbuf_uint(FILE* file,size_t* pnum,size_t maxchr, parse_helper* ph) { 
     int c;
-    int num = 0;
-    while((c = fgetc(file)) != EOF && isspace(c)) { //remove preceding whitespace
-        if(c != '\n')
-            ++ph->pos;
-            else {
-                ++ph->line;
-                ph->pos = 1;
-            }
+    char* buf = malloc(maxchr + 1);
+    c = readbuf_string(file,buf,maxchr,ph);
+    if(c == EOF) {
+        free(buf);
+        return EOF;
     }
-    size_t count = 0;
-    bool flip = false;
-    if(c != EOF && c == '-')
-        flip = true;
-    else if (c != EOF) {
-        ++ph->pos;
-        num = (num * 10) + c - '0';
-    }
-    while(count < maxchr && (c = fgetc(file)) != EOF && isdigit(c)) {
-             flip = true;
-        num = (num * 10) + c - '0';
-        ++ph->pos;
-        ++count;
-    }
-    if(c == '\n') {
-        ++ph->line;
-        ph->pos = 1;
-    }    
-    if (c != EOF && (flip || !isspace(c))) {
-        fprintf(stderr,"ERROR: %s\nNUM:%d\nLINE:%zu\nPOSITION:%zu\n",errmsg,num,ph->line,ph->pos);
+    else if(isvalid_ull(buf)) {
+        char* ptr;
+        *pnum = strtoull(buf,&ptr,10);
+        if(errno == 0) {
+            free(buf);
+            return 1;
+        }
+        else {
+            goto READINTFAIL;
+        }
+    } else {
+    READINTFAIL:
+        fprintf(stderr,"ERROR: Invalid integer given\nBUFFER:\"%s\"\nLINE:%zu\nPOSITION:%zu\n",buf,ph->line,ph->lastword_pos - strlen(buf));
+        free(buf);
         exit(EXIT_FAILURE);
-    }
-    *pnum = num;
-    if(c == EOF)
-        return -1;
-    return 1;
+    }    
 }
 
 //Errors READ_VAR can throw
@@ -122,7 +127,7 @@ typedef enum { TEMP_DOESNT_EXIST = 1, OUTPUT_EXPECTED_ERROR, INPUT_EXPECTED_ERRO
 
 //variable reading helper function
 int read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t output_cap, size_t* value,parse_helper* ph) { 
-    readbuf_string(finput, buf, NAME_SIZE, "variable name read fail",ph);
+    readbuf_string(finput, buf, NAME_SIZE,ph);
     size_t index = get_var(cir, buf);
     //If it doesnt exist (and we need outputs), create it!
     if (index == cir->var_len && i >= output_cap) {
@@ -165,17 +170,17 @@ int main(int argc, char** argv) {
 
     size_t input_len = 0, output_len = 0, index = GET_VAR_NULL_PASSED;
 
-    char* buf = malloc((NAME_SIZE + 1) * sizeof(char));
+    char* buf = malloc(NAME_SIZE + 1);
 
-    readbuf_string(finput, buf, NAME_SIZE, "error reading \"INPUT\" from file",ph);
+    readbuf_string(finput, buf, NAME_SIZE,ph);
     if (strncmp(buf, "INPUT", 5) == 0) {
-        readbuf_uint(finput, &input_len, NAME_SIZE, "could not read amount of input variables",ph);
+        readbuf_uint(finput, &input_len, NAME_SIZE, ph);
         if (input_len > MAX_VAR_COUNT) {
             fprintf(stderr, "ERROR: count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"\nLINE:%zu\nPOSITION:%zu", input_len, MAX_VAR_COUNT,ph->line,ph->pos);
             goto FAIL;
         }
         for (size_t i = 0; i < input_len; i++) {
-            readbuf_string(finput, buf, NAME_SIZE, "input value name read fail",ph);
+            readbuf_string(finput, buf, NAME_SIZE,ph);
             if ((index = get_var(cir, buf)) == cir->var_len)
                 insert_var(cir, INPUT, buf, false);
             else if (index < cir->var_len) {
@@ -193,15 +198,15 @@ int main(int argc, char** argv) {
         goto FAIL;
     }
 
-    readbuf_string(finput, buf, NAME_SIZE, "error reading \"OUTPUT\" from file",ph);
+    readbuf_string(finput, buf, NAME_SIZE, ph);
     if (strncmp(buf, "OUTPUT", 6) == 0) {
-        readbuf_uint(finput, &output_len, NAME_SIZE, "could not read amount of output variables",ph);
+        readbuf_uint(finput, &output_len, NAME_SIZE, ph);
         if (output_len > MAX_VAR_COUNT) {
             fprintf(stderr, "count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", output_len, MAX_VAR_COUNT);
             goto FAIL;
         }
         for (size_t i = 0; i < output_len; i++) {
-            readbuf_string(finput, buf, NAME_SIZE, "output value name read fail",ph);
+            readbuf_string(finput, buf, NAME_SIZE,ph);
             if ((index = get_var(cir, buf)) == cir->var_len)
                 insert_var(cir, OUTPUT, buf,false);
             else if (index < cir->var_len) {
@@ -221,7 +226,7 @@ int main(int argc, char** argv) {
 
     //Read in circuit
     int read_result = 1;
-    while ((read_result = readbuf_string(finput, buf, NAME_SIZE,"gate identifier error",ph)) == 1) {
+    while ((read_result = readbuf_string(finput, buf, NAME_SIZE,ph)) == 1) {
         gate temp_gate = {.kind = 0, .params = NULL, .size = 0, .total_size = 0};
         if (strncmp(buf, "NOT", 3) == 0) temp_gate.kind = NOT;
         else if (strncmp(buf, "PASS", 4) == 0) temp_gate.kind = PASS;
@@ -253,7 +258,7 @@ int main(int argc, char** argv) {
                 break;
             case DECODER:
             case MULTIPLEXER:
-                readbuf_uint(finput, &temp_gate.size, NAME_SIZE, "error reading gate variable N count",ph);
+                readbuf_uint(finput, &temp_gate.size, NAME_SIZE, ph);
                 if (temp_gate.size > MAX_VAR_COUNT) {
                     fprintf(stderr, "gate size, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"", temp_gate.size, MAX_VAR_COUNT);
                     goto FAIL;

@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#undef bool
+#define bool int
+#define unevaluated 2
+
 //Maximum length of name of a variable including null terminator
 #define NAME_SIZE (size_t)64 
 
@@ -14,7 +18,7 @@ typedef enum { INPUT, TEMP, OUTPUT, CONST, DISCARD } type_t;
 // Holds information about name, type, and a boolean in the heap
 typedef struct {
     char letter[NAME_SIZE]; //name of variable
-    bool* value; //holds value
+    bool value; //holds value
     type_t type; //type of variable
 } variable;
 

@@ -6,6 +6,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_C
   "F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/circuit.c.obj"
   "F:/Coding Projects/C/truthtable_c_refactor/src/gate.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/gate.c.obj"
+  "F:/Coding Projects/C/truthtable_c_refactor/src/list.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/list.c.obj"
+  "F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/parsehelper.c.obj"
   "F:/Coding Projects/C/truthtable_c_refactor/src/truthtable.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/truthtable.c.obj"
   "F:/Coding Projects/C/truthtable_c_refactor/src/variable.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/variable.c.obj"
   )

@@ -27,6 +27,12 @@ typedef struct {
     variable* variables;
     size_t var_cap; //Capacity of variables* (used for realloc efficiency)
     size_t var_len; //Variable length
+
+    //amount of input variables
+    //amount of output variables
+    size_t input_len;
+    size_t output_len;
+    
 } circuit;
 
 
@@ -54,14 +60,25 @@ const char* gate_type_to_char(kind_t type);
 #define INSERT_VAR_FAILURE 1
 //attempts to add gate type of kind to c and returns 0 on success or 1 on failure
 //size and params must match with gate type or UB will occur
-int insert_gate(circuit* c, kind_t kind, size_t* params, size_t size, size_t total_size); 
+int insert_gate(circuit* c, kind_t kind, variable** params, size_t size, size_t total_size); 
 
 typedef enum { GATE_RUN_SUCCESS, INVALID_GATE_PASSED, NULL_GATE_PASSED  } gate_return_err;
 
 //Preforms gate action on the gate pointed. returns the result 
-gate_return_err gate_return(circuit* cir,gate* g);
+gate_return_err gate_return(gate* g);
+
+//reset all temp variables to initial states
+void reset_circuit(circuit* cir);
+
+//Output of a circuit given as a number in the range of size_t
+size_t out_circuit(circuit* cir);
+
+//Input a circuit, any bits bigger than 2^(input_len) are truncated and ignored
+void in_circuit(circuit* cir,size_t in);
+
 
 //debug print
+//Prints all variables followed by gates
 void print_circuit(FILE* file,circuit* cir);
 
 //Debug printing of a gate
@@ -72,5 +89,8 @@ void print_circuit(FILE* file,circuit* cir);
 //  - [NAME: Variable2, false (0xA421F412), INPUT]
 //  OUTPUT
 //  - [NAME: Variable3, false (0xA421F412), OUTPUT]
-void print_gate(FILE* file,circuit* cir ,gate* g);
+void print_gate(FILE* file,gate g);
+
+//read in a circuit from a file
+circuit* read_from_file(char* filename);
 #endif

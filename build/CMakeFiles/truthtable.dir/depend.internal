@@ -4,6 +4,8 @@
 CMakeFiles/truthtable.dir/src/circuit.c.obj
  ../include/circuit.h
  ../include/gate.h
+ ../include/list.h
+ ../include/parsehelper.h
  ../include/variable.h
  F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c
 CMakeFiles/truthtable.dir/src/gate.c.obj
@@ -11,6 +13,12 @@ CMakeFiles/truthtable.dir/src/gate.c.obj
  ../include/gate.h
  ../include/variable.h
  F:/Coding Projects/C/truthtable_c_refactor/src/gate.c
+CMakeFiles/truthtable.dir/src/list.c.obj
+ ../include/list.h
+ F:/Coding Projects/C/truthtable_c_refactor/src/list.c
+CMakeFiles/truthtable.dir/src/parsehelper.c.obj
+ ../include/parsehelper.h
+ F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.c
 CMakeFiles/truthtable.dir/src/truthtable.c.obj
  ../include/circuit.h
  ../include/gate.h

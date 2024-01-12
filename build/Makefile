@@ -590,6 +590,60 @@ src/gate.c.s:
 	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/gate.c.s
 .PHONY : src/gate.c.s
 
+src/list.obj: src/list.c.obj
+
+.PHONY : src/list.obj
+
+# target to build an object file
+src/list.c.obj:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/list.c.obj
+.PHONY : src/list.c.obj
+
+src/list.i: src/list.c.i
+
+.PHONY : src/list.i
+
+# target to preprocess a source file
+src/list.c.i:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/list.c.i
+.PHONY : src/list.c.i
+
+src/list.s: src/list.c.s
+
+.PHONY : src/list.s
+
+# target to generate assembly for a file
+src/list.c.s:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/list.c.s
+.PHONY : src/list.c.s
+
+src/parsehelper.obj: src/parsehelper.c.obj
+
+.PHONY : src/parsehelper.obj
+
+# target to build an object file
+src/parsehelper.c.obj:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/parsehelper.c.obj
+.PHONY : src/parsehelper.c.obj
+
+src/parsehelper.i: src/parsehelper.c.i
+
+.PHONY : src/parsehelper.i
+
+# target to preprocess a source file
+src/parsehelper.c.i:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/parsehelper.c.i
+.PHONY : src/parsehelper.c.i
+
+src/parsehelper.s: src/parsehelper.c.s
+
+.PHONY : src/parsehelper.s
+
+# target to generate assembly for a file
+src/parsehelper.c.s:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/parsehelper.c.s
+.PHONY : src/parsehelper.c.s
+
 src/truthtable.obj: src/truthtable.c.obj
 
 .PHONY : src/truthtable.obj
@@ -690,6 +744,12 @@ help:
 	@echo ... src/gate.obj
 	@echo ... src/gate.i
 	@echo ... src/gate.s
+	@echo ... src/list.obj
+	@echo ... src/list.i
+	@echo ... src/list.s
+	@echo ... src/parsehelper.obj
+	@echo ... src/parsehelper.i
+	@echo ... src/parsehelper.s
 	@echo ... src/truthtable.obj
 	@echo ... src/truthtable.i
 	@echo ... src/truthtable.s

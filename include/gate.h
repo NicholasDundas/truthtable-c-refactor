@@ -36,9 +36,15 @@ typedef struct {
     kind_t kind; //type of gate
     size_t size; // indicates size of inputs
     size_t total_size; //total size of params
-    size_t* params; // length determined by kind and size;
+    variable** params; // length determined by kind and size;
     // includes inputs and outputs, indicated by variable numbers
 } gate;
+
+#define GATE_PARAM_BOOL(GATE_PTR,INDEX) (GATE_PTR)->params[(INDEX)]->value
+
+
+//returns true if all inputs have been evaluated before otherwise false
+bool is_evaluable(gate g);
 
 const char* gate_type_to_char(kind_t type);
 #endif

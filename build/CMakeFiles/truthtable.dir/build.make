@@ -101,10 +101,38 @@ CMakeFiles/truthtable.dir/src/gate.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/truthtable.dir/src/gate.c.s"
 	C:\msys64\ucrt64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "F:\Coding Projects\C\truthtable_c_refactor\src\gate.c" -o CMakeFiles\truthtable.dir\src\gate.c.s
 
+CMakeFiles/truthtable.dir/src/list.c.obj: CMakeFiles/truthtable.dir/flags.make
+CMakeFiles/truthtable.dir/src/list.c.obj: CMakeFiles/truthtable.dir/includes_C.rsp
+CMakeFiles/truthtable.dir/src/list.c.obj: ../src/list.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/truthtable.dir/src/list.c.obj"
+	C:\msys64\ucrt64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\truthtable.dir\src\list.c.obj   -c "F:\Coding Projects\C\truthtable_c_refactor\src\list.c"
+
+CMakeFiles/truthtable.dir/src/list.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/truthtable.dir/src/list.c.i"
+	C:\msys64\ucrt64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "F:\Coding Projects\C\truthtable_c_refactor\src\list.c" > CMakeFiles\truthtable.dir\src\list.c.i
+
+CMakeFiles/truthtable.dir/src/list.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/truthtable.dir/src/list.c.s"
+	C:\msys64\ucrt64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "F:\Coding Projects\C\truthtable_c_refactor\src\list.c" -o CMakeFiles\truthtable.dir\src\list.c.s
+
+CMakeFiles/truthtable.dir/src/parsehelper.c.obj: CMakeFiles/truthtable.dir/flags.make
+CMakeFiles/truthtable.dir/src/parsehelper.c.obj: CMakeFiles/truthtable.dir/includes_C.rsp
+CMakeFiles/truthtable.dir/src/parsehelper.c.obj: ../src/parsehelper.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/truthtable.dir/src/parsehelper.c.obj"
+	C:\msys64\ucrt64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\truthtable.dir\src\parsehelper.c.obj   -c "F:\Coding Projects\C\truthtable_c_refactor\src\parsehelper.c"
+
+CMakeFiles/truthtable.dir/src/parsehelper.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/truthtable.dir/src/parsehelper.c.i"
+	C:\msys64\ucrt64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "F:\Coding Projects\C\truthtable_c_refactor\src\parsehelper.c" > CMakeFiles\truthtable.dir\src\parsehelper.c.i
+
+CMakeFiles/truthtable.dir/src/parsehelper.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/truthtable.dir/src/parsehelper.c.s"
+	C:\msys64\ucrt64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "F:\Coding Projects\C\truthtable_c_refactor\src\parsehelper.c" -o CMakeFiles\truthtable.dir\src\parsehelper.c.s
+
 CMakeFiles/truthtable.dir/src/truthtable.c.obj: CMakeFiles/truthtable.dir/flags.make
 CMakeFiles/truthtable.dir/src/truthtable.c.obj: CMakeFiles/truthtable.dir/includes_C.rsp
 CMakeFiles/truthtable.dir/src/truthtable.c.obj: ../src/truthtable.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/truthtable.dir/src/truthtable.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/truthtable.dir/src/truthtable.c.obj"
 	C:\msys64\ucrt64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\truthtable.dir\src\truthtable.c.obj   -c "F:\Coding Projects\C\truthtable_c_refactor\src\truthtable.c"
 
 CMakeFiles/truthtable.dir/src/truthtable.c.i: cmake_force
@@ -118,7 +146,7 @@ CMakeFiles/truthtable.dir/src/truthtable.c.s: cmake_force
 CMakeFiles/truthtable.dir/src/variable.c.obj: CMakeFiles/truthtable.dir/flags.make
 CMakeFiles/truthtable.dir/src/variable.c.obj: CMakeFiles/truthtable.dir/includes_C.rsp
 CMakeFiles/truthtable.dir/src/variable.c.obj: ../src/variable.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/truthtable.dir/src/variable.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/truthtable.dir/src/variable.c.obj"
 	C:\msys64\ucrt64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\truthtable.dir\src\variable.c.obj   -c "F:\Coding Projects\C\truthtable_c_refactor\src\variable.c"
 
 CMakeFiles/truthtable.dir/src/variable.c.i: cmake_force
@@ -133,6 +161,8 @@ CMakeFiles/truthtable.dir/src/variable.c.s: cmake_force
 truthtable_OBJECTS = \
 "CMakeFiles/truthtable.dir/src/circuit.c.obj" \
 "CMakeFiles/truthtable.dir/src/gate.c.obj" \
+"CMakeFiles/truthtable.dir/src/list.c.obj" \
+"CMakeFiles/truthtable.dir/src/parsehelper.c.obj" \
 "CMakeFiles/truthtable.dir/src/truthtable.c.obj" \
 "CMakeFiles/truthtable.dir/src/variable.c.obj"
 
@@ -141,13 +171,15 @@ truthtable_EXTERNAL_OBJECTS =
 
 truthtable.exe: CMakeFiles/truthtable.dir/src/circuit.c.obj
 truthtable.exe: CMakeFiles/truthtable.dir/src/gate.c.obj
+truthtable.exe: CMakeFiles/truthtable.dir/src/list.c.obj
+truthtable.exe: CMakeFiles/truthtable.dir/src/parsehelper.c.obj
 truthtable.exe: CMakeFiles/truthtable.dir/src/truthtable.c.obj
 truthtable.exe: CMakeFiles/truthtable.dir/src/variable.c.obj
 truthtable.exe: CMakeFiles/truthtable.dir/build.make
 truthtable.exe: CMakeFiles/truthtable.dir/linklibs.rsp
 truthtable.exe: CMakeFiles/truthtable.dir/objects1.rsp
 truthtable.exe: CMakeFiles/truthtable.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable truthtable.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Linking C executable truthtable.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\truthtable.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

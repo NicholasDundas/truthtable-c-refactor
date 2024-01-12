@@ -10,6 +10,9 @@
         "stdbool.h": "c",
         "type_traits": "c",
         "stdlib.h": "c",
-        "gate.h": "c"
+        "gate.h": "c",
+        "variable.h": "c",
+        "ctype.h": "c",
+        "cstdlib": "c"
     },
 }

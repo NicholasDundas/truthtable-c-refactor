@@ -3,6 +3,8 @@
 
 CMakeFiles/truthtable.dir/src/circuit.c.obj: ../include/circuit.h
 CMakeFiles/truthtable.dir/src/circuit.c.obj: ../include/gate.h
+CMakeFiles/truthtable.dir/src/circuit.c.obj: ../include/list.h
+CMakeFiles/truthtable.dir/src/circuit.c.obj: ../include/parsehelper.h
 CMakeFiles/truthtable.dir/src/circuit.c.obj: ../include/variable.h
 CMakeFiles/truthtable.dir/src/circuit.c.obj: ../src/circuit.c
 
@@ -10,6 +12,12 @@ CMakeFiles/truthtable.dir/src/gate.c.obj: ../include/circuit.h
 CMakeFiles/truthtable.dir/src/gate.c.obj: ../include/gate.h
 CMakeFiles/truthtable.dir/src/gate.c.obj: ../include/variable.h
 CMakeFiles/truthtable.dir/src/gate.c.obj: ../src/gate.c
+
+CMakeFiles/truthtable.dir/src/list.c.obj: ../include/list.h
+CMakeFiles/truthtable.dir/src/list.c.obj: ../src/list.c
+
+CMakeFiles/truthtable.dir/src/parsehelper.c.obj: ../include/parsehelper.h
+CMakeFiles/truthtable.dir/src/parsehelper.c.obj: ../src/parsehelper.c
 
 CMakeFiles/truthtable.dir/src/truthtable.c.obj: ../include/circuit.h
 CMakeFiles/truthtable.dir/src/truthtable.c.obj: ../include/gate.h

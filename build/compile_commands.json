@@ -11,6 +11,16 @@
 },
 {
   "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Werror -Wpedantic -std=c11 -g   -o CMakeFiles\\truthtable.dir\\src\\list.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\list.c\"",
+  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/list.c"
+},
+{
+  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Werror -Wpedantic -std=c11 -g   -o CMakeFiles\\truthtable.dir\\src\\parsehelper.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\parsehelper.c\"",
+  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.c"
+},
+{
+  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
   "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -Wall -Wextra -Werror -Wpedantic -std=c11 -g   -o CMakeFiles\\truthtable.dir\\src\\truthtable.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\truthtable.c\"",
   "file": "F:/Coding Projects/C/truthtable_c_refactor/src/truthtable.c"
 },

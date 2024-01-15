@@ -28,16 +28,6 @@ stdio.h
 variable.h
 ../include/variable.h
 
-../include/list.h
-stdlib.h
--
-
-../include/parsehelper.h
-stdio.h
--
-stdbool.h
--
-
 ../include/variable.h
 stdbool.h
 -
@@ -46,27 +36,19 @@ stdlib.h
 stdio.h
 -
 
-F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c
-circuit.h
-F:/Coding Projects/C/truthtable_c_refactor/src/circuit.h
+F:/Coding Projects/C/truthtable_c_refactor/src/truthtable.c
 stdlib.h
--
-string.h
 -
 stdio.h
 -
+string.h
+-
 stdbool.h
 -
-stdint.h
+ctype.h
 -
-errno.h
+time.h
 -
-variable.h
-F:/Coding Projects/C/truthtable_c_refactor/src/variable.h
-gate.h
-F:/Coding Projects/C/truthtable_c_refactor/src/gate.h
-list.h
-F:/Coding Projects/C/truthtable_c_refactor/src/list.h
-parsehelper.h
-F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.h
+circuit.h
+F:/Coding Projects/C/truthtable_c_refactor/src/circuit.h
 

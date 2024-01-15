@@ -45,7 +45,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-Wall -Wextra -Werror -Wpedantic -std=c11 -g  "
+					"fragment" : "-Wall -Wextra -Werror -Wpedantic -std=c2x -g  "
 				}
 			],
 			"includes" : 
@@ -77,7 +77,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-Wall -Wextra -Werror -Wpedantic -std=c11 -g",
+				"fragment" : "-Wall -Wextra -Werror -Wpedantic -std=c2x -g",
 				"role" : "flags"
 			},
 			{

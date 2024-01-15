@@ -251,7 +251,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "-Wall -Wextra -Werror -Wpedantic -std=c11"
+			"value" : "-Wall -Wextra -Werror -Wpedantic -std=c2x"
 		},
 		{
 			"name" : "CMAKE_C_FLAGS_DEBUG",

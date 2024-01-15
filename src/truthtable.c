@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "circuit.h"
 
@@ -27,6 +28,7 @@ int main(int argc, char** argv) {
         fprintf(stderr, "usage : %s <FILE_NAME>\n", argv[0]);
         return EXIT_FAILURE;
     }
+    time_t start = time(NULL);
     FILE* output = stdout;
     circuit* cir = read_from_file(argv[1]);
     if(cir != NULL) {
@@ -53,5 +55,6 @@ int main(int argc, char** argv) {
     }
     if(output != stderr && output != stdout)
             fclose(output);
+    fprintf(stdout,"Time taken: %lf\n", difftime(time(NULL), start));
     return EXIT_SUCCESS;
 }

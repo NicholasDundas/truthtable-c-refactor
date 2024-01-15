@@ -22,7 +22,7 @@ size_t get_var(circuit* c, char* name) {
     return c->var_len;
 }
 
-size_t min_len(size_t a, size_t b) {
+static size_t min_len(size_t a, size_t b) {
     if(a < b)
         return a;
     else 
@@ -308,7 +308,19 @@ READ_VAR_FAIL read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t out
     return UNKNOWN_ERROR;
 }
 
-
+bool expect(FILE* file,char* buf,size_t bufmax,const char* expected,size_t expected_size,parse_helper* ph) {
+    switch(readbuf_string(file,buf,bufmax,ph)) {
+        case 1:
+        case -1:
+            if(strncmp(buf,expected,expected_size) == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        case 0:
+            return unevaluated;
+    }
+}
 
 circuit* read_from_file(char *filename) {
     FILE* finput = fopen(filename, "r");
@@ -330,69 +342,45 @@ circuit* read_from_file(char *filename) {
     size_t index = GET_VAR_NULL_PASSED;
 
     char* buf = malloc(NAME_SIZE + 1);
-
-    if (!readbuf_string(finput, buf, NAME_SIZE,ph)) {
-        goto FAIL;
-    }
-    if (strncmp(buf, "INPUT", 5) == 0) {
-        if (!readbuf_uint(finput, &cir->input_len, NAME_SIZE, ph)) {
-            goto FAIL;
-        }
-        if (cir->input_len > MAX_VAR_COUNT) {
-            fprintf(stderr, "ERROR: input count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"\nLINE:%zu\nPOSITION:%zu", cir->input_len, MAX_VAR_COUNT,ph->line,ph->lastword_pos-strlen(buf));
-            goto FAIL;
-        }
-        for (size_t i = 0; i < cir->input_len; i++) {
-            if (!readbuf_string(finput, buf, NAME_SIZE,ph))
-                goto FAIL;
-            if ((index = get_var(cir, buf)) == cir->var_len) {
-                insert_var(cir, INPUT, buf, false);
-                add_to_list(temp_outputs,cir->variables[cir->var_len-1]);
+    size_t* cirptr[] = { &cir->input_len, &cir->output_len};
+    char* expectvalues[] = {"INPUT", "OUTPUT" };
+    char* expectvalueslower[] = {"input", "output"};
+    for(size_t x = 0; x < 2; x++) { //read in input/output
+        switch (expect(finput,buf,NAME_SIZE,expectvalues[x], strlen(expectvalues[x]),ph)) {
+            case true:
+                if (!readbuf_uint(finput, cirptr[x], NAME_SIZE, ph)) {
+                    goto FAIL;
+                }
+                if (cir->input_len > MAX_VAR_COUNT) {
+                    fprintf(stderr, "ERROR: %s count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"\nLINE:%zu\nPOSITION:%zu",expectvalueslower[x] ,cir->input_len, MAX_VAR_COUNT,ph->line,ph->lastword_pos-strlen(buf));
+                    goto FAIL;
+                }
+                for (size_t i = 0; i < *cirptr[x]; i++) {
+                    if (!readbuf_string(finput, buf, NAME_SIZE,ph))
+                        goto FAIL;
+                    if ((index = get_var(cir, buf)) == cir->var_len) {
+                        insert_var(cir, (type_t)x, buf, false);
+                        if((size_t)x == INPUT) {
+                            add_to_list(temp_outputs,cir->variables[cir->var_len-1]);
+                        }
+                    }
+                    else if (index < cir->var_len) {
+                        fprintf(stderr, "duplicate %s variable name entered : %s\nLINE:%zu\nPOSITION:%zu",expectvalueslower[x], buf,ph->line,ph->lastword_pos-strlen(buf)-1);
+                        goto FAIL;
+                    }
+                    else {
+                        fprintf(stderr, "invalid %s variable name entered : %s\nLINE:%zu\nPOSITION:%zu",expectvalueslower[x], buf,ph->line,ph->lastword_pos-strlen(buf)-1);
+                        goto FAIL;
+                    }
             }
-            else if (index < cir->var_len) {
-                fprintf(stderr, "duplicate input variable name entered : %s\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
+            break;
+            case false:
+                fprintf(stderr, "Error parsing file, \"%s\" indentifer not found, \"%s\" was found instead\nLINE:%zu\nPOSITION:%zu",expectvalues[x], buf,ph->line,ph->lastword_pos-strlen(buf)-1);
+                __attribute__ ((fallthrough));
+            case unevaluated:
                 goto FAIL;
-            }
-            else {
-                fprintf(stderr, "invalid input variable name entered : %s\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
-                goto FAIL;
-            }
         }
     }
-    else {
-        fprintf(stderr, "Error parsing file, \"INPUT\" indentifer not found, \"%s\" was found instead\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
-        goto FAIL;
-    }
-
-    if (!readbuf_string(finput, buf, NAME_SIZE,ph)) {
-        goto FAIL;
-    }
-    if (strncmp(buf, "OUTPUT", 6) == 0) {
-        if (!readbuf_uint(finput, &cir->output_len, NAME_SIZE, ph))
-            goto FAIL;
-        if (cir->output_len > MAX_VAR_COUNT) {
-            fprintf(stderr, "ERROR: output count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"\nLINE:%zu\nPOSITION:%zu", cir->output_len, MAX_VAR_COUNT,ph->line,ph->lastword_pos-strlen(buf));
-            goto FAIL;
-        }
-        for (size_t i = 0; i < cir->output_len; i++) {
-            if (!readbuf_string(finput, buf, NAME_SIZE,ph))
-                goto FAIL;
-            if ((index = get_var(cir, buf)) == cir->var_len)
-                insert_var(cir, OUTPUT, buf,false);
-            else if (index < cir->var_len) {
-                fprintf(stderr, "duplicate output variable name entered : %s\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
-                goto FAIL;
-            }
-            else {
-                fprintf(stderr, "invalid output variable name entered : %s\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
-                goto FAIL;
-            }
-        }
-    } else {
-        fprintf(stderr,"Error parsing file, \"INPUT\" indentifer not found, \"%s\" was found instead\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
-        goto FAIL;
-    }
-
 
     //Read in circuit
     int read_result = 1;
@@ -408,7 +396,7 @@ circuit* read_from_file(char *filename) {
         else if (strncmp(buf, "DECODER",7) == 0) temp_gate.kind = DECODER;
         else if (strncmp(buf, "MULTIPLEXER",11) == 0) temp_gate.kind = MULTIPLEXER;
         else {
-            fprintf(stderr, "Unknown gate type : %s\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
+            fprintf(stderr, "Unknown gate type : %s\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf)-1);
             goto FAIL;
         }
         temp_gate.size = 1; temp_gate.total_size = 2; //Size of params (includes all inputs, outputs, selectors, etc)
@@ -430,7 +418,7 @@ circuit* read_from_file(char *filename) {
             case MULTIPLEXER:
                 readbuf_uint(finput, &temp_gate.size, NAME_SIZE, ph);
                 if (temp_gate.size > MAX_VAR_COUNT) {
-                    fprintf(stderr, "gate size, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"\nLINE:%zu\nPOSITION:%zu", temp_gate.size, MAX_VAR_COUNT,ph->line,ph->lastword_pos-strlen(buf));
+                    fprintf(stderr, "gate size, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"\nLINE:%zu\nPOSITION:%zu", temp_gate.size, MAX_VAR_COUNT,ph->line,ph->lastword_pos-strlen(buf)-1);
                     goto FAIL;
                 }
                 temp_gate.total_size = temp_gate.size + ((size_t)1 << temp_gate.size) + (temp_gate.kind == MULTIPLEXER ? 1 : 0);
@@ -443,10 +431,10 @@ circuit* read_from_file(char *filename) {
             if (temp_gate.params[i] == NULL) {
                 switch (res) {
                     case INPUT_EXPECTED_ERROR:
-                        fprintf(stderr, "could not read in variable as  \"%s\" is not of type CONST, INPUT, or TEMP\n\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
+                        fprintf(stderr, "could not read in variable as  \"%s\" is not of type CONST, INPUT, or TEMP\n\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf)-1);
                         break;
                     case OUTPUT_EXPECTED_ERROR:
-                        fprintf(stderr, "could not read in variable as  \"%s\" is not of type DISCARD, OUTPUT, or TEMP\n\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
+                        fprintf(stderr, "could not read in variable as  \"%s\" is not of type DISCARD, OUTPUT, or TEMP\n\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf)-1);
                         break;
                     case UNKNOWN_ERROR: 
                     default:
@@ -469,9 +457,10 @@ circuit* read_from_file(char *filename) {
         goto FAIL;
     }
     if (read_result != EOF) {
-        fprintf(stderr, "error reading gates, buf = \"%s\"\nLINE:%zu\nPOSITION:%zu",buf,ph->line,ph->lastword_pos-strlen(buf));
+        fprintf(stderr, "error reading gates, buf = \"%s\"\nLINE:%zu\nPOSITION:%zu",buf,ph->line,ph->lastword_pos-strlen(buf)-1);
         goto FAIL;
     }
+
     fclose(finput);
     free(buf); 
     free(ph);
@@ -479,10 +468,8 @@ circuit* read_from_file(char *filename) {
     free_list(temp_outputs);
     free_list(temp_inputs_position);
     return cir;
+
     FAIL: //Failstate exits and returns 1
-    while(temp_inputs->size != 0) {
-        remove_from_list(temp_inputs);
-    }
     while(temp_inputs_position->size != 0) {
         free(remove_from_list(temp_inputs_position));
     }
@@ -495,5 +482,4 @@ circuit* read_from_file(char *filename) {
     free_list(temp_outputs);
     free_list(temp_inputs_position);
     return cir;
-
 }

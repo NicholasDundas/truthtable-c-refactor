@@ -7,6 +7,10 @@
 
 #undef bool
 #define bool int
+#undef true
+#define true 1
+#undef false
+#define false 0
 #define unevaluated 2
 
 //Maximum length of name of a variable including null terminator

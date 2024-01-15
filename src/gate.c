@@ -19,14 +19,14 @@ bool is_evaluable(gate g) {
         case NOR:
             return g.params[0]->value != unevaluated && g.params[1]->value != unevaluated;
         case DECODER:
-            for(size_t i = 0; i < g.size; i++)
-                if(g.params[i]->value == unevaluated)
-                    return false;
+            for(size_t i = 0; i < g.size; i++) {
+                if(g.params[i]->value == unevaluated) return false;
+            }
             return true;
         case MULTIPLEXER:
-            for(size_t i = 0; i < g.total_size-1; i++)
-                if(g.params[i]->value == unevaluated)
-                    return false;
+            for(size_t i = 0; i < g.total_size-1; i++) {
+                if(g.params[i]->value == unevaluated) return false;
+            }
             return true;
         default:
             return false;

@@ -27,32 +27,31 @@ int main(int argc, char** argv) {
         fprintf(stderr, "usage : %s <FILE_NAME>\n", argv[0]);
         return EXIT_FAILURE;
     }
-    FILE* output = fopen("out.txt", "w");
-    for(int x = 0; x < 1000000; x++) {
-        circuit* cir = read_from_file(argv[1]);
-        if(cir != NULL) {
-            for (size_t i = 0; i < (size_t)1 << cir->input_len; i++) {
-                //Setting Inputs to an increasing Number i
-                in_circuit(cir, i);
-
-                out_circuit(cir);
-
-                for (size_t k = 0; k < cir->input_len; ++k) {
-                    fprintf(output,"%d ", cir->variables[k + CIRCUIT_CONST_OFFSET].value);
-                }
-                fprintf(output,"|");
-                for (size_t k = cir->input_len; k < cir->input_len + cir->output_len; k++) {
-                    fprintf(output," %d", cir->variables[k + CIRCUIT_CONST_OFFSET].value);
-                }
-                fprintf(output,"\n");
+    FILE* output = stdout;
+    circuit* cir = read_from_file(argv[1]);
+    if(cir != NULL) {
+        for (size_t i = 0; i < (size_t)1 << cir->input_len; ++i) {
+            //Setting Inputs to an increasing Number i
+            in_circuit(cir, i);
+            out_circuit(cir);
+            for (size_t k = cir->input_len - 1; k != SIZE_MAX; --k) {
+                fprintf(output,"%d ", cir->variables[k + CIRCUIT_CONST_OFFSET]->value);
             }
-            fprintf(output,"\n\n");
-            //print_circuit(output,cir);
-            free_circuit(cir);
-        } else 
-            return EXIT_FAILURE;
+            fprintf(output,"|");
+            for (size_t k = cir->input_len; k < cir->input_len + cir->output_len; ++k) {
+                fprintf(output," %d", cir->variables[k + CIRCUIT_CONST_OFFSET]->value);
+            }
+            fprintf(output,"\n");
+        }
+        fprintf(output,"\n\n");
+        //print_circuit(output,cir);
+        free_circuit(cir);
+    } else {
+        if(output != stderr && output != stdout)
+            fclose(output);
+        return EXIT_FAILURE;
     }
     if(output != stderr && output != stdout)
-        fclose(output);
+            fclose(output);
     return EXIT_SUCCESS;
 }

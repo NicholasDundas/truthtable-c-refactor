@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <errno.h>
 
 #include "variable.h"
 #include "gate.h"
@@ -15,23 +17,34 @@ size_t get_var(circuit* c, char* name) {
         return GET_VAR_NULL_PASSED;
     }
     for (size_t i = 0; i != c->var_len; ++i)
-        if (strncmp(c->variables[i].letter, name, NAME_SIZE) == 0)
+        if (strncmp(c->variables[i]->letter, name, NAME_SIZE) == 0)
             return i;
     return c->var_len;
+}
+
+size_t min_len(size_t a, size_t b) {
+    if(a < b)
+        return a;
+    else 
+        return b;
 }
 
 int insert_var(circuit* c, type_t type, char* name, bool value) {
     if (c != NULL && name != NULL) {
         if (c->var_len >= c->var_cap) {
             c->var_cap *= 2;
-            c->variables = realloc(c->variables, sizeof(variable) * c->var_cap);
+            c->variables = realloc(c->variables, sizeof(variable*) * c->var_cap);
         }
-        memcpy(&c->variables[c->var_len].letter, name, sizeof(char) * NAME_SIZE);
-        c->variables[c->var_len].type = type;
-        c->variables[c->var_len].value = value;
+        c->variables[c->var_len] = malloc(sizeof(variable));
+        size_t namelen = min_len(strlen(name),NAME_SIZE);
+        memcpy(c->variables[c->var_len]->letter, name, namelen);
+        c->variables[c->var_len]->letter[namelen] = '\0';
+        c->variables[c->var_len]->type = type;
+        c->variables[c->var_len]->value = value;
         ++c->var_len;
+        return 0;
     }
-    return 1;
+    return INSERT_GATE_FAILURE;
 }
 
 circuit* init_circuit(void) {
@@ -57,6 +70,9 @@ circuit* init_circuit(void) {
 
 void free_circuit(circuit* cir) {
     if (cir != NULL) {
+        for (size_t i = 0; i < cir->var_len; ++i) {
+            free(cir->variables[i]); 
+        }
         free(cir->variables);
         for (size_t i = 0; i < cir->gate_len; ++i) {
             free(cir->gates[i].params); 
@@ -83,8 +99,9 @@ int insert_gate(circuit* c, kind_t kind, variable** params, size_t size,size_t t
 }
 
 void in_circuit(circuit *cir, size_t in) {
-    for (size_t k = cir->input_len - 1; k != SIZE_MAX; k--) {
-        cir->variables[k + CIRCUIT_CONST_OFFSET].value = in & 1;
+    reset_circuit(cir);
+    for (size_t k = 0; k < cir->input_len; k++) {
+        cir->variables[k + CIRCUIT_CONST_OFFSET]->value = in & 1;
         in >>= 1;
     }
 }
@@ -94,7 +111,7 @@ void print_circuit(FILE *file, circuit *cir)
     fprintf(file, "CIRCUIT\n VARIABLES:");
     for(size_t i = 0; i < cir->var_len; i++) {
         fprintf(file,"\n  ");
-        print_var(file, &cir->variables[i]);
+        print_var(file, cir->variables[i]);
     }
     fprintf(file, "\n GATES:");
     for(size_t i = 0; i < cir->gate_len; i++) {
@@ -141,8 +158,9 @@ gate_return_err gate_return(gate* g) {
         case MULTIPLEXER:
         //loop until the element before the last element as the output is the true final element
             os = 0;
-            for(size_t sp = 1 << g->size; sp < g->total_size; ++sp)
-                os += (GATE_PARAM_BOOL(g,sp) ? 1 << (sp - (1 << g->size)) : 0);     
+            for(size_t sp = 1 << g->size; sp < g->total_size-1; ++sp) {
+                os += (GATE_PARAM_BOOL(g,sp) ? (1 << (sp - (1 << g->size))) : 0);   
+            }  
             GATE_PARAM_BOOL(g,g->total_size - 1) = GATE_PARAM_BOOL(g,os);
             break;
         default:
@@ -153,9 +171,9 @@ gate_return_err gate_return(gate* g) {
 
 void reset_circuit(circuit *cir) {
     for(size_t i = CIRCUIT_CONST_OFFSET; i < cir->var_len; i++)
-        switch(cir->variables[i].type) {
+        switch(cir->variables[i]->type) {
             case TEMP:
-                cir->variables[i].value = unevaluated;
+                cir->variables[i]->value = unevaluated;
                 break;
             default:
                 continue;
@@ -168,10 +186,11 @@ size_t out_circuit(circuit *cir) {
     reset_circuit(cir);
     list* l = init_list();
     for (size_t c = 0; c < cir->gate_len; c++) {
-        if(is_evaluable(cir->gates[c]))
+        if(is_evaluable(cir->gates[c])) {
             gate_return(&cir->gates[c]);
-        else
+        } else {
             add_to_list(l,&cir->gates[c]);
+        }
         for(size_t c = l->size-1; c != SIZE_MAX ; --c) {
             gate* index = get_list(l,c);
             if(is_evaluable(*index)) {
@@ -179,9 +198,10 @@ size_t out_circuit(circuit *cir) {
             }
         }
     }
+    free_list(l);
     size_t num = 0;
     for (size_t k = cir->input_len + cir->output_len; k != cir->input_len; k--) {
-        num |= cir->variables[(k - 1) + CIRCUIT_CONST_OFFSET].value & 1;
+        num |= cir->variables[(k - 1) + CIRCUIT_CONST_OFFSET]->value & 1;
         num <<= 1;
     }
     return num;
@@ -224,33 +244,54 @@ void print_gate(FILE* file,gate g) {
 
 }
 
+
 //Errors READ_VAR can throw
-typedef enum { OUTPUT_EXPECTED_ERROR = 2, INPUT_EXPECTED_ERROR ,UNKNOWN_ERROR, BUFFER_OVERFLW } READ_VAR_FAIL;
+typedef enum { READ_VAR_SUCCESS = 0,OUTPUT_EXPECTED_ERROR = 2, INPUT_EXPECTED_ERROR ,UNKNOWN_ERROR, BUFFER_OVERFLW, READ_VAR_EOF = EOF } READ_VAR_FAIL;
 
 //variable reading helper function
-int read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t output_cap, variable** value,parse_helper* ph) { 
+READ_VAR_FAIL read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t output_cap, variable** value,parse_helper* ph,list* outputs, list* inputs) { 
     int res = readbuf_string(finput, buf, NAME_SIZE,ph);
     if (res == 0)
         return BUFFER_OVERFLW;
     size_t index = get_var(cir, buf);
     //If it doesnt exist (and we need outputs), create it!
     if (index == cir->var_len) {
-        insert_var(cir, TEMP, buf,false);
-        *value = &cir->variables[cir->var_len - 1];
-        return res != EOF ? EXIT_SUCCESS : EOF;
+        insert_var(cir, TEMP, buf,unevaluated);
+        *value = cir->variables[cir->var_len - 1];
+        if(i < output_cap) {
+            if((index = list_contains_mem(outputs,*value,sizeof(variable*))) == SIZE_MAX) {
+                add_to_list(inputs,*value);
+            }
+        } else {
+            add_to_list(outputs,*value);
+        }
+        return res != EOF ? READ_VAR_SUCCESS : READ_VAR_EOF;
     }
     //Must read in an input, const, or temp as an input before the index i reaches output_cap, in which it will only accept const_out, temp, and OUTPUT
     else if (index != cir->var_len && //Make sure we found something before...
-        ((i >= output_cap && output_friendly(cir->variables[index])) //Are we expecting output?
-        || (i < output_cap && input_friendly(cir->variables[index])))) { //Are we expecting input?
-            *value = &cir->variables[index];
-            return res != EOF ? EXIT_SUCCESS : EOF;
+        ((i >= output_cap && output_friendly(*cir->variables[index])) //Are we expecting output?
+        || (i < output_cap && input_friendly(*cir->variables[index])))) { //Are we expecting input?
+            *value = cir->variables[index];
+            if(i < output_cap) {
+                if(list_contains_mem(outputs,*value,sizeof(variable*)) == SIZE_MAX 
+                && list_contains_mem(inputs,*value,sizeof(variable*)) == SIZE_MAX) {
+                    add_to_list(inputs,*value);
+                }
+            } else {
+                add_to_list(outputs,*value);
+                while((index = list_contains_mem(inputs,*value,sizeof(variable*))) != SIZE_MAX) {
+                    remove_from_list_index(inputs,index);
+                }
+            }
+            return res != EOF ? READ_VAR_SUCCESS : READ_VAR_EOF;
     }
     *value = NULL;
-    if (i >= output_cap && input_friendly(cir->variables[index]))
+    if (i >= output_cap && input_friendly(*cir->variables[index])) {
         return OUTPUT_EXPECTED_ERROR;
-    if (i < output_cap && output_friendly(cir->variables[index]))
+    }
+    if (i < output_cap && output_friendly(*cir->variables[index])) {
         return INPUT_EXPECTED_ERROR;
+    }
     return UNKNOWN_ERROR;
 }
 
@@ -258,22 +299,28 @@ circuit* read_from_file(char *filename) {
     FILE* finput = fopen(filename, "r");
     if (finput == NULL) {
         fprintf(stderr, "error opening file, \"%s\": %s",filename ,strerror(errno));
-        goto FAIL;
+        return NULL;
     }
-
 
     circuit* cir = init_circuit();
     parse_helper* ph = init_ph();
 
+    list* temp_inputs = init_list();
+    list* temp_outputs = init_list();
+    for(size_t i = 0;i< cir->var_len;i++) {
+        add_to_list(temp_outputs,cir->variables[i]);
+    }
     size_t index = GET_VAR_NULL_PASSED;
 
     char* buf = malloc(NAME_SIZE + 1);
 
-    if (!readbuf_string(finput, buf, NAME_SIZE,ph))
+    if (!readbuf_string(finput, buf, NAME_SIZE,ph)) {
         goto FAIL;
+    }
     if (strncmp(buf, "INPUT", 5) == 0) {
-        if (!readbuf_uint(finput, &cir->input_len, NAME_SIZE, ph))
+        if (!readbuf_uint(finput, &cir->input_len, NAME_SIZE, ph)) {
             goto FAIL;
+        }
         if (cir->input_len > MAX_VAR_COUNT) {
             fprintf(stderr, "ERROR: input count, \"%zu\", exceeds MAX_VAR_COUNT, \"%zu\"\nLINE:%zu\nPOSITION:%zu", cir->input_len, MAX_VAR_COUNT,ph->line,ph->lastword_pos-strlen(buf));
             goto FAIL;
@@ -281,8 +328,10 @@ circuit* read_from_file(char *filename) {
         for (size_t i = 0; i < cir->input_len; i++) {
             if (!readbuf_string(finput, buf, NAME_SIZE,ph))
                 goto FAIL;
-            if ((index = get_var(cir, buf)) == cir->var_len)
+            if ((index = get_var(cir, buf)) == cir->var_len) {
                 insert_var(cir, INPUT, buf, false);
+                add_to_list(temp_outputs,cir->variables[cir->var_len-1]);
+            }
             else if (index < cir->var_len) {
                 fprintf(stderr, "duplicate input variable name entered : %s\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf));
                 goto FAIL;
@@ -298,8 +347,9 @@ circuit* read_from_file(char *filename) {
         goto FAIL;
     }
 
-    if (!readbuf_string(finput, buf, NAME_SIZE,ph))
+    if (!readbuf_string(finput, buf, NAME_SIZE,ph)) {
         goto FAIL;
+    }
     if (strncmp(buf, "OUTPUT", 6) == 0) {
         if (!readbuf_uint(finput, &cir->output_len, NAME_SIZE, ph))
             goto FAIL;
@@ -372,7 +422,7 @@ circuit* read_from_file(char *filename) {
         }
         temp_gate.params = malloc(sizeof(variable*) * temp_gate.total_size);
         for (size_t i = 0; i < temp_gate.total_size; ++i) {
-            READ_VAR_FAIL res = read_var(finput,cir,buf,i,output_cap, &temp_gate.params[i],ph);
+            READ_VAR_FAIL res = read_var(finput,cir,buf,i,output_cap, &temp_gate.params[i],ph,temp_outputs,temp_inputs);
             if (temp_gate.params[i] == NULL) {
                 switch (res) {
                     case INPUT_EXPECTED_ERROR:
@@ -390,18 +440,37 @@ circuit* read_from_file(char *filename) {
         }
         insert_gate(cir, temp_gate.kind, temp_gate.params, temp_gate.size, temp_gate.total_size);       
     }
+    if(temp_inputs->size != 0) {
+        fprintf(stderr, "Error, missing outputs for temporary variables:");
+        list_node* node = temp_inputs->head;
+        while(node != NULL) {
+            fprintf(stderr,"\"%s\"",((variable*)node->data)->letter);
+            if(node->next != NULL) {
+                fprintf(stderr,", ");
+            }
+            node = node->next;
+        }
+        fprintf(stderr,"\n");
+        goto FAIL;
+    }
     if (read_result != EOF) {
         fprintf(stderr, "error reading gates, buf = \"%s\"\nLINE:%zu\nPOSITION:%zu",buf,ph->line,ph->lastword_pos-strlen(buf));
         goto FAIL;
     }
     fclose(finput);
     free(buf); 
+    free(ph);
+    free_list(temp_inputs);
+    free_list(temp_outputs);
     return cir;
     FAIL: //Failstate exits and returns 1
     free_circuit(cir);
+    free(ph);
     cir = NULL;
     fclose(finput);
     free(buf); 
+    free_list(temp_inputs);
+    free_list(temp_outputs);
     return cir;
 
 }

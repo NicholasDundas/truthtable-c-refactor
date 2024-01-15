@@ -31,6 +31,10 @@ void* remove_from_list(list* list);
 //removes data from list at index and pops
 void* remove_from_list_index(list* list,size_t index);
 
+//does a simple memcmpr to check for equality
+//returns SIZE_MAX on false else returns index
+size_t list_contains_mem(list* list,void* obj,size_t size);
+
 //frees list object and all nodes
 //DOES NOT FREE DATA
 void free_list(list* list);

@@ -17,7 +17,7 @@ typedef enum { INPUT, TEMP, OUTPUT, CONST, DISCARD } type_t;
 
 // Holds information about name, type, and a boolean in the heap
 typedef struct {
-    char letter[NAME_SIZE]; //name of variable
+    char letter[NAME_SIZE + 1]; //name of variable
     bool value; //holds value
     type_t type; //type of variable
 } variable;

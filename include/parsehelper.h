@@ -12,6 +12,8 @@ typedef struct {
     size_t lastword_pos; //points to the last letter after a word
 } parse_helper;
 
+
+
 //creates a parse_helper struct
 //sets line,pos, and lastword_pos to 1
 parse_helper* init_ph();

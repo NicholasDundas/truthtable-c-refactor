@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "variable.h"
 #include "gate.h"
@@ -24,7 +25,7 @@ typedef struct {
     - Then Outputs declared on the next
     - Then Temporary Variables declared as needed
     */
-    variable* variables;
+    variable** variables;
     size_t var_cap; //Capacity of variables* (used for realloc efficiency)
     size_t var_len; //Variable length
 

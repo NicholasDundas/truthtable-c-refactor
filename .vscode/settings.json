@@ -13,6 +13,7 @@
         "gate.h": "c",
         "variable.h": "c",
         "ctype.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "typeinfo": "c"
     },
 }

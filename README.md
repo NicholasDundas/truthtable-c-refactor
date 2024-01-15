@@ -54,7 +54,7 @@ There are five types of variables. Input, Output, Temporary Variables, Constants
 - Constant Variables may only be used as inputs of gates and their values cannot be changed. 
   - Two names are set aside for constant variables "1" and "0" representing their binary equivalents.
 - Output variables may only be used as outputs of gates
-- Temporary Variables may be used as outputs, or if declared beforehand, may be used as inputs
+- Temporary Variables may be used as outputs, or if declared somewhere as an output, may be used as an input
 - Discard Variables may only be used as output and their result is effectively ignored
   - The name "_" is set aside to be used for discard variables. 
 

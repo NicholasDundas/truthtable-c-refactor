@@ -244,12 +244,16 @@ void print_gate(FILE* file,gate g) {
 
 }
 
+typedef struct {
+    size_t line;
+    size_t pos;
+} word_pos;
 
 //Errors READ_VAR can throw
 typedef enum { READ_VAR_SUCCESS = 0,OUTPUT_EXPECTED_ERROR = 2, INPUT_EXPECTED_ERROR ,UNKNOWN_ERROR, BUFFER_OVERFLW, READ_VAR_EOF = EOF } READ_VAR_FAIL;
 
 //variable reading helper function
-READ_VAR_FAIL read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t output_cap, variable** value,parse_helper* ph,list* outputs, list* inputs) { 
+READ_VAR_FAIL read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t output_cap, variable** value,parse_helper* ph,list* outputs, list* inputs,list* inputs_pos) { 
     int res = readbuf_string(finput, buf, NAME_SIZE,ph);
     if (res == 0)
         return BUFFER_OVERFLW;
@@ -260,6 +264,10 @@ READ_VAR_FAIL read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t out
         *value = cir->variables[cir->var_len - 1];
         if(i < output_cap) {
             if((index = list_contains_mem(outputs,*value,sizeof(variable*))) == SIZE_MAX) {
+                word_pos* tmp = malloc(sizeof(word_pos));
+                tmp->line = ph->line;
+                tmp->pos = ph->lastword_pos-strlen(buf)-1;
+                add_to_list(inputs_pos,tmp);
                 add_to_list(inputs,*value);
             }
         } else {
@@ -275,11 +283,16 @@ READ_VAR_FAIL read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t out
             if(i < output_cap) {
                 if(list_contains_mem(outputs,*value,sizeof(variable*)) == SIZE_MAX 
                 && list_contains_mem(inputs,*value,sizeof(variable*)) == SIZE_MAX) {
+                    word_pos* tmp = malloc(sizeof(word_pos));
+                    tmp->line = ph->line;
+                    tmp->pos = ph->lastword_pos-strlen(buf)-1;
+                    add_to_list(inputs_pos,tmp);
                     add_to_list(inputs,*value);
                 }
             } else {
                 add_to_list(outputs,*value);
                 while((index = list_contains_mem(inputs,*value,sizeof(variable*))) != SIZE_MAX) {
+                    free(remove_from_list_index(inputs_pos,index));
                     remove_from_list_index(inputs,index);
                 }
             }
@@ -295,6 +308,8 @@ READ_VAR_FAIL read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t out
     return UNKNOWN_ERROR;
 }
 
+
+
 circuit* read_from_file(char *filename) {
     FILE* finput = fopen(filename, "r");
     if (finput == NULL) {
@@ -306,6 +321,8 @@ circuit* read_from_file(char *filename) {
     parse_helper* ph = init_ph();
 
     list* temp_inputs = init_list();
+    list* temp_inputs_position = init_list();
+
     list* temp_outputs = init_list();
     for(size_t i = 0;i< cir->var_len;i++) {
         add_to_list(temp_outputs,cir->variables[i]);
@@ -422,7 +439,7 @@ circuit* read_from_file(char *filename) {
         }
         temp_gate.params = malloc(sizeof(variable*) * temp_gate.total_size);
         for (size_t i = 0; i < temp_gate.total_size; ++i) {
-            READ_VAR_FAIL res = read_var(finput,cir,buf,i,output_cap, &temp_gate.params[i],ph,temp_outputs,temp_inputs);
+            READ_VAR_FAIL res = read_var(finput,cir,buf,i,output_cap, &temp_gate.params[i],ph,temp_outputs,temp_inputs,temp_inputs_position);
             if (temp_gate.params[i] == NULL) {
                 switch (res) {
                     case INPUT_EXPECTED_ERROR:
@@ -441,14 +458,12 @@ circuit* read_from_file(char *filename) {
         insert_gate(cir, temp_gate.kind, temp_gate.params, temp_gate.size, temp_gate.total_size);       
     }
     if(temp_inputs->size != 0) {
-        fprintf(stderr, "Error, missing outputs for temporary variables:");
+        fprintf(stderr, "Error, missing outputs for temporary variables:\n");
         list_node* node = temp_inputs->head;
         while(node != NULL) {
-            fprintf(stderr,"\"%s\"",((variable*)node->data)->letter);
-            if(node->next != NULL) {
-                fprintf(stderr,", ");
-            }
+            fprintf(stderr,"NAME:%s\nLINE:%zu\nPOSITION:%zu\n",((variable*)node->data)->letter,((word_pos*)temp_inputs_position->head->data)->line,((word_pos*)temp_inputs_position->head->data)->pos);
             node = node->next;
+            free(remove_from_list(temp_inputs_position));
         }
         fprintf(stderr,"\n");
         goto FAIL;
@@ -462,8 +477,15 @@ circuit* read_from_file(char *filename) {
     free(ph);
     free_list(temp_inputs);
     free_list(temp_outputs);
+    free_list(temp_inputs_position);
     return cir;
     FAIL: //Failstate exits and returns 1
+    while(temp_inputs->size != 0) {
+        remove_from_list(temp_inputs);
+    }
+    while(temp_inputs_position->size != 0) {
+        free(remove_from_list(temp_inputs_position));
+    }
     free_circuit(cir);
     free(ph);
     cir = NULL;
@@ -471,6 +493,7 @@ circuit* read_from_file(char *filename) {
     free(buf); 
     free_list(temp_inputs);
     free_list(temp_outputs);
+    free_list(temp_inputs_position);
     return cir;
 
 }

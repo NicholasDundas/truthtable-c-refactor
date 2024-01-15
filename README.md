@@ -116,12 +116,12 @@ It will print out into the console a truth table consisting of ones and zeros.
 The example program above would have printed  
 ```
 0 0 0 | 0
-1 0 0 | 0
-0 1 0 | 0
-1 1 0 | 1
 0 0 1 | 0
-1 0 1 | 1 
-0 1 1 | 0 
+0 1 0 | 0
+0 1 1 | 1
+1 0 0 | 0
+1 0 1 | 1
+1 1 0 | 0
 1 1 1 | 1
 ```
 Where the first numbers represent the binary representation of inputs followed by a pipe which then prints the resulting outputs.

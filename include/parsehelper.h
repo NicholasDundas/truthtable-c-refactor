@@ -10,6 +10,7 @@ typedef struct {
     size_t line;
     size_t pos;
     size_t lastword_pos; //points to the last letter after a word
+
 } parse_helper;
 
 
@@ -35,9 +36,14 @@ int ph_ignorews(FILE* file, parse_helper* ph) ;
 //limited by maxchr and increments the parse_helper to keep track of line and current character
 //assumes buffer is large enough to handle the string
 //returns 0 if input is bigger than buffer
-//returns -1 if read EOF and on succes or 1 on just success
+//returns -1 if read EOF and on success or 1 on just success
 int readbuf_string(FILE* file,char* buf,size_t maxchr,parse_helper* ph);
 
+//attempts to read an unsigned long int to pnum
+//limited by maxchr and increments the parse_helper to keep track of line and current character
+//assumes buffer is large enough to handle the string
+//returns 0 if input is bigger than buffer
+//returns -1 if read EOF and on success or 1 on just success
 int readbuf_uint(FILE* file,size_t* pnum,size_t maxchr, parse_helper* ph);
 
 bool is_consect_digit(char* buf);

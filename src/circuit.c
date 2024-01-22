@@ -29,18 +29,22 @@ static size_t min_len(size_t a, size_t b) {
         return b;
 }
 
-int insert_var(circuit* c, type_t type, char* name, bool value) {
+int insert_var(circuit* c, type_t type, char* name, var_result value) {
     if (c != NULL && name != NULL) {
         if (c->var_len >= c->var_cap) {
             c->var_cap *= 2;
             c->variables = realloc(c->variables, sizeof(variable*) * c->var_cap);
         }
+
         c->variables[c->var_len] = malloc(sizeof(variable));
         size_t namelen = min_len(strlen(name),NAME_SIZE);
         memcpy(c->variables[c->var_len]->letter, name, namelen);
         c->variables[c->var_len]->letter[namelen] = '\0';
+
         c->variables[c->var_len]->type = type;
+
         c->variables[c->var_len]->value = value;
+
         ++c->var_len;
         return 0;
     }
@@ -58,9 +62,9 @@ circuit* init_circuit(void) {
         cir->var_cap = 4;
         cir->variables = malloc(sizeof(variable) * cir->var_cap);
         //Inserting Constants into Circuit
-        insert_var(cir, CONST, "0", false);
-        insert_var(cir, CONST, "1", true);
-        insert_var(cir, DISCARD, "_", false);
+        insert_var(cir, CONST, "0", var_false);
+        insert_var(cir, CONST, "1", var_true);
+        insert_var(cir, DISCARD, "_", var_uneval);
 
         cir->input_len = 0;
         cir->output_len = 0;
@@ -78,11 +82,15 @@ void free_circuit(circuit* cir) {
             free(cir->gates[i].params); 
         }
         free(cir->gates);
+        while(cir->circuit_dictionary->size != 0) {
+            free(remove_from_list(cir->circuit_dictionary));
+        }
+        free_list(cir->circuit_dictionary);
         free(cir);
     }
 }
 
-int insert_gate(circuit* c, kind_t kind, variable** params, size_t size,size_t total_size) {
+int insert_gate(circuit* c, kind_t kind, variable** params, size_t size,size_t total_size,circuit* cir) {
     if (c != NULL) {
         if (c->gate_len >= c->gate_cap) {
             c->gate_cap = (c->gate_cap << 1) - (c->gate_cap >> 1);
@@ -91,6 +99,7 @@ int insert_gate(circuit* c, kind_t kind, variable** params, size_t size,size_t t
         c->gates[c->gate_len].kind = kind;
         c->gates[c->gate_len].params = params;
         c->gates[c->gate_len].size = size;
+        c->gates[c->gate_len].cir_ptr = cir;
         c->gates[c->gate_len].total_size = total_size;
         ++c->gate_len;
         return 0;
@@ -120,64 +129,13 @@ void print_circuit(FILE *file, circuit *cir)
     }
 }
 
-gate_return_err gate_return(gate* g) { 
-    if (g == NULL) {
-                return NULL_GATE_PASSED;
-    }
-    size_t os; //output selector for Decoders/Multiplexers    
-    switch (g->kind) {
-        case NOT:
-            GATE_PARAM_BOOL(g,1) = GATE_PARAM_BOOL(g,0) ? false : true;
-            break;
-        case AND:
-            GATE_PARAM_BOOL(g,2) = GATE_PARAM_BOOL(g,0) && GATE_PARAM_BOOL(g,1);
-            break;
-        case OR:
-            GATE_PARAM_BOOL(g,2) = GATE_PARAM_BOOL(g,0) || GATE_PARAM_BOOL(g,1);
-            break;
-        case PASS:
-            GATE_PARAM_BOOL(g,1) = GATE_PARAM_BOOL(g,0);
-            break;
-        case XOR:
-            GATE_PARAM_BOOL(g,2) = GATE_PARAM_BOOL(g,0) ^ GATE_PARAM_BOOL(g,1);
-            break;
-        case NAND:
-            GATE_PARAM_BOOL(g,2) = (GATE_PARAM_BOOL(g,0) && GATE_PARAM_BOOL(g,1)) ? false : true;
-            break;
-        case NOR:
-             GATE_PARAM_BOOL(g,2) = (GATE_PARAM_BOOL(g,0) || GATE_PARAM_BOOL(g,1)) ? false : true;
-            break;
-        case DECODER:
-            for(size_t sp = g->size; sp < g->total_size; ++sp) //reset outputs
-                GATE_PARAM_BOOL(g,sp) = false;
-            os = g->size;
-            for (size_t sp = 0; sp < g->size; ++sp)
-                os += (GATE_PARAM_BOOL(g,sp) ? 1 << sp : 0);
-            GATE_PARAM_BOOL(g,os)= 1;
-            break;
-        case MULTIPLEXER:
-        //loop until the element before the last element as the output is the true final element
-            os = 0;
-            for(size_t sp = 1 << g->size; sp < g->total_size-1; ++sp) {
-                os += (GATE_PARAM_BOOL(g,sp) ? (1 << (sp - (1 << g->size))) : 0);   
-            }  
-            GATE_PARAM_BOOL(g,g->total_size - 1) = GATE_PARAM_BOOL(g,os);
-            break;
-        default:
-            return INVALID_GATE_PASSED;
-    }
-    return GATE_RUN_SUCCESS;
-}
 
 void reset_circuit(circuit *cir) {
-    for(size_t i = CIRCUIT_CONST_OFFSET; i < cir->var_len; i++)
-        switch(cir->variables[i]->type) {
-            case TEMP:
-                cir->variables[i]->value = unevaluated;
-                break;
-            default:
-                continue;
+    for(size_t i = CIRCUIT_CONST_OFFSET; i < cir->var_len; i++) {
+        if(cir->variables[i]->type == TEMP) {
+                cir->variables[i]->value = var_uneval;
         }
+    }
 }
 
 
@@ -192,7 +150,7 @@ size_t out_circuit(circuit *cir) {
             add_to_list(l,&cir->gates[c]);
         }
         for(size_t c = l->size-1; c != SIZE_MAX ; --c) {
-            gate* index = get_list(l,c);
+            gate* index = get_list_func(l,c);
             if(is_evaluable(*index)) {
                 gate_return((gate*)remove_from_list_index(l,c));
             }
@@ -201,48 +159,12 @@ size_t out_circuit(circuit *cir) {
     free_list(l);
     size_t num = 0;
     for (size_t k = cir->input_len + cir->output_len; k != cir->input_len; k--) {
-        num |= cir->variables[(k - 1) + CIRCUIT_CONST_OFFSET]->value & 1;
         num <<= 1;
+        num |= cir->variables[(k - 1) + CIRCUIT_CONST_OFFSET]->value & 1;
     }
     return num;
 }
 
-void print_gate(FILE* file,gate g) {
-    fprintf(file, " GATE: ");
-    fprintf(file,"%s",gate_type_to_char(g.kind));
-    size_t i;
-    fprintf(file, "\n      INPUT");
-    if(g.kind != MULTIPLEXER) {
-        for(i = 0; i < g.size; ++i) {
-            fprintf(file, "\n       ");
-            print_var(file, g.params[i]);
-        }            
-        fprintf(file, "\n      OUTPUT");
-        if(g.kind != DECODER) {
-            fprintf(file, "\n       ");
-            print_var(file, g.params[i]);
-        } else {
-            for(; i < g.total_size; ++i) {
-                fprintf(file, "\n       ");
-                print_var(file, g.params[i]);
-            }
-        }
-    } else {
-        for(i = 0; i < ((size_t)1 << g.size); ++i) {
-            fprintf(file, "\n       ");
-            print_var(file, g.params[i]);
-            fprintf(file, "\n");
-        }
-        fprintf(file, "      SELECTORS");
-            for(; i < g.total_size - 1; ++i) {
-                fprintf(file, "\n       ");
-                print_var(file, g.params[i]);
-            }
-        fprintf(file, "\n      OUTPUT\n       ");
-        print_var(file, g.params[i]);
-    }
-
-}
 
 typedef struct {
     size_t line;
@@ -260,7 +182,7 @@ READ_VAR_FAIL read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t out
     size_t index = get_var(cir, buf);
     //If it doesnt exist (and we need outputs), create it!
     if (index == cir->var_len) {
-        insert_var(cir, TEMP, buf,unevaluated);
+        insert_var(cir, TEMP, buf,false);
         *value = cir->variables[cir->var_len - 1];
         if(i < output_cap) {
             if((index = list_contains_mem(outputs,*value,sizeof(variable*))) == SIZE_MAX) {
@@ -311,43 +233,116 @@ READ_VAR_FAIL read_var(FILE* finput, circuit* cir, char* buf,size_t i,size_t out
 bool expect(FILE* file,char* buf,size_t bufmax,const char* expected,size_t expected_size,parse_helper* ph) {
     switch(readbuf_string(file,buf,bufmax,ph)) {
         case 1:
-        case -1:
+        case EOF:
             if(strncmp(buf,expected,expected_size) == 0) {
                 return true;
             } else {
                 return false;
             }
+        default:
         case 0:
-            return unevaluated;
+            return false;
     }
 }
 
-circuit* read_from_file(char *filename) {
-    FILE* finput = fopen(filename, "r");
+circuit* read_from_file_name(char *filename) {
+    FILE* finput = fopen(filename,"r");
     if (finput == NULL) {
         fprintf(stderr, "error opening file, \"%s\": %s",filename ,strerror(errno));
         return NULL;
     }
-
-    circuit* cir = init_circuit();
     parse_helper* ph = init_ph();
+    circuit* cir = read_from_file(finput,ph,false);
+    free(ph);
+    return cir;
+}
 
-    list* temp_inputs = init_list();
-    list* temp_inputs_position = init_list();
+
+cd_entry *create_entry(const char* name, size_t size, circuit* ptr) {
+    cd_entry* tmp = malloc(sizeof(cd_entry));
+    strncpy(tmp->letter,name,size);
+    tmp->ptr = malloc(sizeof(circuit*));
+    tmp->ptr = ptr;
+    tmp->declared = false;
+    tmp->input_len = 0;
+    tmp->output_len = 0;
+    return tmp;
+}
+
+void free_entry(cd_entry* entry) {
+    if(entry->ptr != NULL) {
+        free_circuit(entry->ptr);
+        
+    }
+    free(entry);
+}
+
+circuit* read_from_file(FILE *finput, parse_helper* ph,list* cir_dictionary_param) {
+    
+    circuit* cir = init_circuit();
+
+    list* expected_input_vars = init_list();
+    list* expected_input_vars_pos = init_list();
 
     list* temp_outputs = init_list();
     for(size_t i = 0;i< cir->var_len;i++) {
         add_to_list(temp_outputs,cir->variables[i]);
     }
-    size_t index = GET_VAR_NULL_PASSED;
 
+    list* circuit_dictionary;
+    if(cir_dictionary_param == NULL) {
+        circuit_dictionary = init_list();
+    }
+    else {
+        circuit_dictionary = cir_dictionary_param;
+    }
+
+    size_t index = GET_VAR_NULL_PASSED;
     char* buf = malloc(NAME_SIZE + 1);
+    int c;
+    while((c = readbuf_string(finput, buf, NAME_SIZE,ph)) == 1 && strncmp(buf,"FUNC",4) == 0) {
+        if(cir_dictionary_param == NULL) { //we are in the top most recursive level
+            switch ((c = readbuf_string(finput, buf, NAME_SIZE,ph))) {
+                case 1:
+                    list_node* tmp = circuit_dictionary->head;
+                    while(tmp != NULL && strncmp(((circuit_dictionary_entry*)tmp->data)->letter,buf,NAME_SIZE) != 0) {
+                        tmp = tmp->next;
+                    }
+                    if(tmp != NULL) {
+                        fprintf(stderr, "Duplicate Function name found \"%s\"\nLINE:%zu\nPOSITION:%zu",buf,ph->line,ph->lastword_pos-strlen(buf)-2);
+                        goto FAIL;
+                    }
+                    circuit_dictionary_entry* tmpentry = create_entry(buf,NAME_SIZE,malloc(sizeof(circuit*)));
+                    tmpentry->ptr = read_from_file(finput,ph,circuit_dictionary);
+                    if(finput == NULL)
+                        goto FAIL;
+                    add_to_list(circuit_dictionary,tmpentry);
+                    break;
+                case EOF:
+                    fprintf(stderr, "End of file encountered when reading FUNC name\nNAME:%s\nLINE:%zu\nPOSITION:%zu",buf,ph->line,ph->lastword_pos-strlen(buf)-2);
+                    __attribute__ ((fallthrough));
+                case 0:
+                    goto FAIL;
+                    break;
+            }
+        } else {
+            fprintf(stderr, "Not allowed to declare FUNC within functions\nLINE:%zu\nPOSITION:%zu",buf,ph->line,ph->lastword_pos-strlen(buf)-2);
+            goto FAIL;
+        }
+    }
+    switch (c) {
+        case EOF:
+            fprintf(stderr, "End of file encountered when attempting to read %s variable name\nBUF:%s\nLINE:%zu\nPOSITION:%zu",expectvalueslower[x],buf,ph->line,ph->lastword_pos-strlen(buf)-2);
+            __attribute__ ((fallthrough));
+        case 0:
+            goto FAIL;
+        default:
+    }
     size_t* cirptr[] = { &cir->input_len, &cir->output_len};
     char* expectvalues[] = {"INPUT", "OUTPUT" };
     char* expectvalueslower[] = {"input", "output"};
     for(size_t x = 0; x < 2; x++) { //read in input/output
-        switch (expect(finput,buf,NAME_SIZE,expectvalues[x], strlen(expectvalues[x]),ph)) {
-            case true:
+        if(strncmp(buf,expectvalues[x],NAME_SIZE) == 0) {
                 if (!readbuf_uint(finput, cirptr[x], NAME_SIZE, ph)) {
                     goto FAIL;
                 }
@@ -356,12 +351,25 @@ circuit* read_from_file(char *filename) {
                     goto FAIL;
                 }
                 for (size_t i = 0; i < *cirptr[x]; i++) {
-                    if (!readbuf_string(finput, buf, NAME_SIZE,ph))
-                        goto FAIL;
+                    if ((c = readbuf_string(finput, buf, NAME_SIZE,ph)) != 1) {
+                        switch (c) {
+                            case EOF:
+                                fprintf(stderr, "End of file encountered when attempting to read %s variable name\nBUF:%s\nLINE:%zu\nPOSITION:%zu",expectvalueslower[x],buf,ph->line,ph->lastword_pos-strlen(buf)-2);
+                                __attribute__ ((fallthrough));
+                            case 0:
+                                goto FAIL;   
+                        }
+                    }
                     if ((index = get_var(cir, buf)) == cir->var_len) {
-                        insert_var(cir, (type_t)x, buf, false);
-                        if((size_t)x == INPUT) {
+                        insert_var(cir, (x == 0 ? INPUT : OUTPUT), buf, false);
+                        if(x == 0) {
                             add_to_list(temp_outputs,cir->variables[cir->var_len-1]);
+                        } else if(x == 1) {
+                            word_pos* tmp = malloc(sizeof(word_pos));
+                            tmp->line = ph->line;
+                            tmp->pos = ph->lastword_pos-strlen(buf)-1;
+                            add_to_list(expected_input_vars_pos,tmp);
+                            add_to_list(expected_input_vars,cir->variables[cir->var_len-1]);
                         }
                     }
                     else if (index < cir->var_len) {
@@ -373,19 +381,23 @@ circuit* read_from_file(char *filename) {
                         goto FAIL;
                     }
             }
-            break;
-            case false:
-                fprintf(stderr, "Error parsing file, \"%s\" indentifer not found, \"%s\" was found instead\nLINE:%zu\nPOSITION:%zu",expectvalues[x], buf,ph->line,ph->lastword_pos-strlen(buf)-1);
-                __attribute__ ((fallthrough));
-            case unevaluated:
-                goto FAIL;
+        } else {
+            goto FAIL;
+        }
+        if ((c = readbuf_string(finput, buf, NAME_SIZE,ph)) != 1) {
+            switch (c) {
+                case EOF:
+                    fprintf(stderr, "End of file encountered when attempting to find %s identifer\nBUF:%s\nLINE:%zu\nPOSITION:%zu",expectvalueslower[x],buf,ph->line,ph->lastword_pos-strlen(buf)-2);
+                    __attribute__ ((fallthrough));
+                case 0:
+                    goto FAIL;   
+            }
         }
     }
-
     //Read in circuit
     int read_result = 1;
     while ((read_result = readbuf_string(finput, buf, NAME_SIZE,ph)) == 1) {
-        gate temp_gate = {.kind = 0, .params = NULL, .size = 0, .total_size = 0};
+        gate temp_gate = {.kind = 0, .params = NULL, .size = 0, .total_size = 0, .cir_ptr = NULL};
         if (strncmp(buf, "NOT", 3) == 0) temp_gate.kind = NOT;
         else if (strncmp(buf, "PASS", 4) == 0) temp_gate.kind = PASS;
         else if (strncmp(buf, "AND", 3) == 0) temp_gate.kind = AND;
@@ -395,8 +407,32 @@ circuit* read_from_file(char *filename) {
         else if (strncmp(buf, "XOR", 3) == 0) temp_gate.kind = XOR;
         else if (strncmp(buf, "DECODER",7) == 0) temp_gate.kind = DECODER;
         else if (strncmp(buf, "MULTIPLEXER",11) == 0) temp_gate.kind = MULTIPLEXER;
-        else {
-            fprintf(stderr, "Unknown gate type : %s\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf)-1);
+        else if (cir_dictionary_param == NULL && strncmp(buf, "FUNC",4) == 0) {
+            readbuf_string(finput, buf, NAME_SIZE,ph);
+            circuit_pointer* cirp = malloc(sizeof(circuit_pointer));
+            strncpy(cirp->letter,buf,NAME_SIZE);
+            circuit* new_cir = read_from_file(finput,ph,true);
+            cirp->ptr = new_cir;
+            if(new_cir == NULL) {
+                free(cirp);
+                goto FAIL;
+            }
+            add_to_list(cir->circuit_dictionary,cirp);
+        } else if (sub == true && strncmp(buf, "END",3) == 0) {
+            goto ENDFUNC;
+        }  else {
+            list_node* node = cir->circuit_dictionary->head;
+            while(node != NULL) {
+                circuit_pointer* tmp = node->data;
+                if(strncmp(tmp->letter,buf,NAME_SIZE) == 0) {
+                    temp_gate.kind = CIR_PTR;
+                    temp_gate.cir_ptr = tmp->ptr;
+                }
+                node = node->next;
+            }
+            if (node == NULL)  {
+                fprintf(stderr, "Unknown gate type : %s\nLINE:%zu\nPOSITION:%zu", buf,ph->line,ph->lastword_pos-strlen(buf)-2);
+            }
             goto FAIL;
         }
         temp_gate.size = 1; temp_gate.total_size = 2; //Size of params (includes all inputs, outputs, selectors, etc)
@@ -424,10 +460,14 @@ circuit* read_from_file(char *filename) {
                 temp_gate.total_size = temp_gate.size + ((size_t)1 << temp_gate.size) + (temp_gate.kind == MULTIPLEXER ? 1 : 0);
                 output_cap = temp_gate.size + (temp_gate.kind == MULTIPLEXER ? ((size_t)1 << temp_gate.size) : 0);
                 break;
+            case CIR_PTR:
+                temp_gate.size = temp_gate.cir_ptr->input_len;
+                temp_gate.total_size = temp_gate.cir_ptr->var_len - CIRCUIT_CONST_OFFSET;
+                output_cap = temp_gate.cir_ptr->input_len + CIRCUIT_CONST_OFFSET;
         }
         temp_gate.params = malloc(sizeof(variable*) * temp_gate.total_size);
         for (size_t i = 0; i < temp_gate.total_size; ++i) {
-            READ_VAR_FAIL res = read_var(finput,cir,buf,i,output_cap, &temp_gate.params[i],ph,temp_outputs,temp_inputs,temp_inputs_position);
+            READ_VAR_FAIL res = read_var(finput,cir,buf,i,output_cap, &temp_gate.params[i],ph,temp_outputs,expected_input_vars,expected_input_vars_pos);
             if (temp_gate.params[i] == NULL) {
                 switch (res) {
                     case INPUT_EXPECTED_ERROR:
@@ -443,43 +483,42 @@ circuit* read_from_file(char *filename) {
                 goto FAIL;
             }
         }
-        insert_gate(cir, temp_gate.kind, temp_gate.params, temp_gate.size, temp_gate.total_size);       
-    }
-    if(temp_inputs->size != 0) {
-        fprintf(stderr, "Error, missing outputs for temporary variables:\n");
-        list_node* node = temp_inputs->head;
-        while(node != NULL) {
-            fprintf(stderr,"NAME:%s\nLINE:%zu\nPOSITION:%zu\n",((variable*)node->data)->letter,((word_pos*)temp_inputs_position->head->data)->line,((word_pos*)temp_inputs_position->head->data)->pos);
-            node = node->next;
-            free(remove_from_list(temp_inputs_position));
-        }
-        fprintf(stderr,"\n");
-        goto FAIL;
+        insert_gate(cir, temp_gate.kind, temp_gate.params, temp_gate.size, temp_gate.total_size,temp_gate.cir_ptr);       
     }
     if (read_result != EOF) {
         fprintf(stderr, "error reading gates, buf = \"%s\"\nLINE:%zu\nPOSITION:%zu",buf,ph->line,ph->lastword_pos-strlen(buf)-1);
         goto FAIL;
     }
+    ENDFUNC:
+    if(expected_input_vars->size != 0) {
+        fprintf(stderr, "Error, missing outputs for\n");
+        list_node* node = expected_input_vars->head;
+        while(node != NULL) {
+            fprintf(stderr,"VARIABLE:%s\nTYPE:%s\nLINE:%zu\nPOSITION:%zu\n",((variable*)node->data)->letter,variable_type_to_char(((variable*)node->data)->type),((word_pos*)expected_input_vars_pos->head->data)->line,((word_pos*)expected_input_vars_pos->head->data)->pos);
+            node = node->next;
+            free(remove_from_list(expected_input_vars_pos));
+        }
+        fprintf(stderr,"\n");
+        goto FAIL;
+    }
 
-    fclose(finput);
     free(buf); 
-    free(ph);
-    free_list(temp_inputs);
+    free_list(expected_input_vars);
     free_list(temp_outputs);
-    free_list(temp_inputs_position);
+    free_list(expected_input_vars_pos);
     return cir;
-
     FAIL: //Failstate exits and returns 1
-    while(temp_inputs_position->size != 0) {
-        free(remove_from_list(temp_inputs_position));
+    while(expected_input_vars_pos->size != 0) {
+        free(remove_from_list(expected_input_vars_pos));
+    }
+    while(cir->circuit_dictionary->size != 0) {
+        free(remove_from_list(cir->circuit_dictionary));
     }
     free_circuit(cir);
-    free(ph);
     cir = NULL;
-    fclose(finput);
     free(buf); 
-    free_list(temp_inputs);
+    free_list(expected_input_vars);
     free_list(temp_outputs);
-    free_list(temp_inputs_position);
-    return cir;
+    free_list(expected_input_vars_pos);
+    return cir; 
 }

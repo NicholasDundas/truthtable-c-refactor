@@ -1,12 +1,12 @@
 #ifndef CIRCUIT_H
 #define CIRCUIT_H
 
-#include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "variable.h"
+#include "list.h"
 #include "gate.h"
+#include "parsehelper.h"
 
 #define MAX_VAR_COUNT (size_t)32
 
@@ -14,7 +14,7 @@
 #define CIRCUIT_CONST_OFFSET (size_t)3
 
 //Circuit struct to hold information about gates and variables
-typedef struct {
+typedef struct Circuit {
     gate* gates; //All Gates
     size_t gate_len; //Amount of circuits to run
     size_t gate_cap; //Capacity of gate* (used for realloc efficiency)
@@ -33,9 +33,14 @@ typedef struct {
     //amount of output variables
     size_t input_len;
     size_t output_len;
-    
+    char[NAME_SIZE+1] name;
+    list* circuit_dictionary; //contains circuits
 } circuit;
 
+
+typedef circuit_dictionary_entry cd_entry;
+
+#define CIRCUIT_VAR_BOOL(CIR_PTR,INDEX) (CIR_PTR)->variables[(INDEX)]->value
 
 #define INSERT_GATE_FAILURE 1
 //Attempts to insert a variable into c
@@ -61,12 +66,8 @@ const char* gate_type_to_char(kind_t type);
 #define INSERT_VAR_FAILURE 1
 //attempts to add gate type of kind to c and returns 0 on success or 1 on failure
 //size and params must match with gate type or UB will occur
-int insert_gate(circuit* c, kind_t kind, variable** params, size_t size, size_t total_size); 
+int insert_gate(circuit* c, kind_t kind, variable** params, size_t size, size_t total_size,circuit* cir); 
 
-typedef enum { GATE_RUN_SUCCESS, INVALID_GATE_PASSED, NULL_GATE_PASSED  } gate_return_err;
-
-//Preforms gate action on the gate pointed. returns the result 
-gate_return_err gate_return(gate* g);
 
 //reset all temp variables to initial states
 void reset_circuit(circuit* cir);
@@ -82,16 +83,10 @@ void in_circuit(circuit* cir,size_t in);
 //Prints all variables followed by gates
 void print_circuit(FILE* file,circuit* cir);
 
-//Debug printing of a gate
-//Example:
-//GATE: AND
-//  INPUT
-//  - [NAME: Variable1, true (0xA421F412), INPUT]
-//  - [NAME: Variable2, false (0xA421F412), INPUT]
-//  OUTPUT
-//  - [NAME: Variable3, false (0xA421F412), OUTPUT]
-void print_gate(FILE* file,gate g);
 
 //read in a circuit from a file
-circuit* read_from_file(char* filename);
+circuit* read_from_file_name(char *filename); 
+
+//read in a circuit from a file
+circuit* read_from_file(FILE* finput, parse_helper* ph,list* cir_dictionary_param);
 #endif

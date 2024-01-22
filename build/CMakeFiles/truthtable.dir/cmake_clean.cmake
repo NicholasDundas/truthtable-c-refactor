@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/truthtable.dir/src/circuit.c.obj"
   "CMakeFiles/truthtable.dir/src/gate.c.obj"
   "CMakeFiles/truthtable.dir/src/list.c.obj"
+  "CMakeFiles/truthtable.dir/src/maybe.c.obj"
   "CMakeFiles/truthtable.dir/src/parsehelper.c.obj"
   "CMakeFiles/truthtable.dir/src/truthtable.c.obj"
   "CMakeFiles/truthtable.dir/src/variable.c.obj"

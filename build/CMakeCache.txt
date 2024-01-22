@@ -47,7 +47,7 @@ CMAKE_C_COMPILER_AR:FILEPATH=C:/msys64/ucrt64/bin/gcc-ar.exe
 CMAKE_C_COMPILER_RANLIB:FILEPATH=C:/msys64/ucrt64/bin/gcc-ranlib.exe
 
 //Flags used by the C compiler during all build types.
-CMAKE_C_FLAGS:STRING=-Wall -Wextra -Werror -Wpedantic -std=c2x
+CMAKE_C_FLAGS:STRING=-Wall -Wextra -Werror -Wpedantic -std=c11
 
 //Flags used by the C compiler during DEBUG builds.
 CMAKE_C_FLAGS_DEBUG:STRING=-g

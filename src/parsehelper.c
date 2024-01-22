@@ -47,7 +47,9 @@ int readbuf_string(FILE* file,char* buf,size_t maxchr,parse_helper* ph) {
     int c;
     size_t count = 0;
 
-    if((c = ph_ignorews(file,ph)) == EOF) return EOF;
+    if((c = ph_ignorews(file,ph)) == EOF) {
+        return EOF;
+    }
     
     while(count < maxchr && (buf[count++] = (char)c, !isspace(c = ph_get(file,ph)) && isprint(c))) {}
     buf[count] = '\0';
@@ -56,8 +58,7 @@ int readbuf_string(FILE* file,char* buf,size_t maxchr,parse_helper* ph) {
         fprintf(stderr,"ERROR: Input Buffer overflow (MAX ALLOWED: %zu)\nBUFFER:\"%s\"\nLINE:%zu\nPOSITION:%zu\n",maxchr,buf,ph->line,ph->lastword_pos - count);
         return 0;
     }
-    if(c == EOF) return EOF;
-    return 1;
+    return (c == EOF) ? EOF : 1;
 }
 
 //checks if a number is a non-negative digit less than 21 digits
@@ -66,8 +67,9 @@ bool is_consect_digit(char* buf) {
     while(isdigit(*ptr)) {
         ++ptr; 
     }
-    if(*ptr == '\0' && (ptr-buf) < 21)
+    if(*ptr == '\0' && (ptr-buf) < 21) { //21 is the width of characters for size_t....
         return true;
+    }
     return false;
 }
 
@@ -83,7 +85,7 @@ int readbuf_uint(FILE* file,size_t* pnum,size_t maxchr, parse_helper* ph) {
             return c == EOF ? EOF : 1;
         }
     }
-    fprintf(stderr,"ERROR: Invalid integer given\nBUFFER:\"%s\"\nLINE:%zu\nPOSITION:%zu\n",buf,ph->line,ph->lastword_pos - strlen(buf));
+    fprintf(stderr,"ERROR: Invalid integer given\nBUFFER:\"%s\"\nLINE:%zu\nPOSITION:%zu\n",buf,ph->line,ph->lastword_pos - strlen(buf)-2);
     free(buf);
     return 0;
 }

@@ -27,21 +27,20 @@ const char* variable_type_to_char(type_t type) {
 }
 
 void print_var(FILE* file,variable* v) {
-    if(v) {
+    if(v != NULL) {
         fprintf(file,"[%s, ", v->letter);
         switch(v->value) {
-            case true:
+            case var_true:
                 fprintf(file, "true (%p)",(void*)v);
                 break;
-            case false:
+            case var_false:
                 fprintf(file, "false (%p)",(void*)v);
                 break;
-            case unevaluated:
+            case var_uneval:
                 fprintf(file, "unevaluated (%p)",(void*)v);
                 break;
             default:
-                fprintf(file, "unknown (%p)",(void*)v);
-                break;
+                fprintf(file, "error value (%p)",(void*)v);
         }
         fprintf(file,", %s",variable_type_to_char(v->type));
         fprintf(file,"]");
@@ -52,18 +51,9 @@ void print_var(FILE* file,variable* v) {
 
 void print_bool(FILE* file,bool* v) {
     fprintf(file,"[");
-    switch(*v) {
-        case true:
+    if(*v) {
             fprintf(file, "true (%p)]",(void*)v);
-            break;
-        case false:
+    } else {
             fprintf(file, "false (%p)]",(void*)v);
-            break;
-        case unevaluated:
-            fprintf(file, "unevaluated (%p)]",(void*)v);
-            break;
-        default:
-            fprintf(file, "unknown (%p)]",(void*)v);
-            break;
     }
 }

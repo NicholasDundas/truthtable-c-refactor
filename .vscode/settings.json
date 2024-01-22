@@ -14,6 +14,10 @@
         "variable.h": "c",
         "ctype.h": "c",
         "cstdlib": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c",
+        "circuit.h": "c"
     },
 }

@@ -1,28 +1,21 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 
-#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#undef bool
-#define bool int
-#undef true
-#define true 1
-#undef false
-#define false 0
-#define unevaluated 2
+#include "maybe.h"
 
 //Maximum length of name of a variable including null terminator
 #define NAME_SIZE (size_t)64 
 
 //Defines the types of variables
 typedef enum { INPUT, TEMP, OUTPUT, CONST, DISCARD } type_t; 
-
+typedef enum { var_false = 0, var_true = 1, var_uneval} var_result;
 // Holds information about name, type, and a boolean in the heap
 typedef struct {
     char letter[NAME_SIZE + 1]; //name of variable
-    bool value; //holds value
+    var_result value; //holds value
     type_t type; //type of variable
 } variable;
 

@@ -14,13 +14,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 #include <ctype.h>
 #include <time.h>
 
 #include "circuit.h"
-
-
 
 
 int main(int argc, char** argv) {
@@ -30,7 +27,7 @@ int main(int argc, char** argv) {
     }
     time_t start = time(NULL);
     FILE* output = stdout;
-    circuit* cir = read_from_file(argv[1]);
+    circuit* cir = read_from_file_name(argv[1]);
     if(cir != NULL) {
         for (size_t i = 0; i < (size_t)1 << cir->input_len; ++i) {
             //Setting Inputs to an increasing Number i

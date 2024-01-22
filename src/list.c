@@ -9,13 +9,45 @@ list* init_list() {
     return tmp;
 }
 
-
 void add_to_list(list* list, void* data) {
     list_node* temp_node = malloc(sizeof(list_node));
     temp_node->data = data;
     temp_node->next = list->head;
     list->head = temp_node;
     list->size++;
+}
+
+void add_to_list_sort(list *list, void *data, bool (*cmprfunc)(void *, void *)) {
+    if(list->size == 0) {
+        add_to_list(list,data);
+    } else {
+        list_node* temp_node = malloc(sizeof(list_node));
+        temp_node->data = data;
+        temp_node->next = NULL;
+        list_node* traverse = list->head; 
+        size_t index = 0;
+        while(++index <= list->size && cmprfunc(data,traverse->data)) {
+            traverse = traverse->next;
+        }
+        temp_node->next = traverse->next;
+        traverse->next = temp_node;
+    }
+}
+
+void add_to_list_index(list *list, void *data, size_t index) {
+    if(index == 0) {
+        add_to_list(list,data);
+    } else if(index <= list->size) {
+        list_node* temp_node = malloc(sizeof(list_node));
+        temp_node->data = data;
+        temp_node->next = NULL;
+        list_node* traverse = list->head; 
+        while(--index) {
+            traverse = traverse->next;
+        }
+        temp_node->next = traverse->next;
+        traverse->next = temp_node;
+    }
 }
 
 void* remove_from_list(list* list) {
@@ -40,12 +72,11 @@ void* remove_from_list_index(list* list,size_t index) {
         prev = cur;
         cur = cur->next;
     }
-
     void* data = cur->data;
-    if(prev == NULL) {
-        list->head = cur->next;
-    } else {
+    if(prev) {
         prev->next = cur->next;
+    } else {
+        list->head = cur->next;
     }
     free(cur);
     --list->size;
@@ -75,14 +106,14 @@ void free_list(list* list) {
     free(list);
 }
 
-void *get_list(list *list, size_t index)
+void *get_list_func(list *list, size_t index)
 {
     if (list->size == 0 || index > list->size) {
         return NULL;
     }
     list_node* cur = list->head;
     while(index-- != 0) {
-        cur = list->head->next;
+        cur = cur->next;
     }
     return cur->data;
 }

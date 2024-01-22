@@ -2,6 +2,7 @@
 #define LIST_H
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 //stores data and pointer to the next node
 typedef struct list_node list_node;
@@ -25,6 +26,9 @@ list* init_list();
 //adds data to front of list
 void add_to_list(list* list, void* data);
 
+//adds data to list via a sorting function
+void add_to_list_sort(list* list,void* data , bool (*cmprfunc)(void *, void *));
+
 //removes data from front of list and pops
 void* remove_from_list(list* list);
 
@@ -40,6 +44,9 @@ size_t list_contains_mem(list* list,void* obj,size_t size);
 void free_list(list* list);
 
 //gets data at the index from the list
-void* get_list(list* list, size_t index);
+void* get_list_func(list* list, size_t index);
 
+
+//gets data at the index from the list and converts to type
+#define get_list(TYPE,LIST_PTR,INDEX) (*(TYPE*)get_list_func(LIST_PTR,INDEX))
 #endif

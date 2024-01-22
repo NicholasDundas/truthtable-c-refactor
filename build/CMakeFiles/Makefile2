@@ -253,12 +253,12 @@ CMakeFiles/NightlyBuild.dir/clean:
 CMakeFiles/truthtable.dir/all:
 	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/depend
 	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=1,2,3,4,5,6,7 "Built target truthtable"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir="F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" --progress-num=1,2,3,4,5,6,7,8 "Built target truthtable"
 .PHONY : CMakeFiles/truthtable.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/truthtable.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" 7
+	$(CMAKE_COMMAND) -E cmake_progress_start "F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" 8
 	$(MAKE) -f CMakeFiles\Makefile2 CMakeFiles/truthtable.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start "F:\Coding Projects\C\truthtable_c_refactor\build\CMakeFiles" 0
 .PHONY : CMakeFiles/truthtable.dir/rule

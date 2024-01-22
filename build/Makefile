@@ -617,6 +617,33 @@ src/list.c.s:
 	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/list.c.s
 .PHONY : src/list.c.s
 
+src/maybe.obj: src/maybe.c.obj
+
+.PHONY : src/maybe.obj
+
+# target to build an object file
+src/maybe.c.obj:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/maybe.c.obj
+.PHONY : src/maybe.c.obj
+
+src/maybe.i: src/maybe.c.i
+
+.PHONY : src/maybe.i
+
+# target to preprocess a source file
+src/maybe.c.i:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/maybe.c.i
+.PHONY : src/maybe.c.i
+
+src/maybe.s: src/maybe.c.s
+
+.PHONY : src/maybe.s
+
+# target to generate assembly for a file
+src/maybe.c.s:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/maybe.c.s
+.PHONY : src/maybe.c.s
+
 src/parsehelper.obj: src/parsehelper.c.obj
 
 .PHONY : src/parsehelper.obj
@@ -747,6 +774,9 @@ help:
 	@echo ... src/list.obj
 	@echo ... src/list.i
 	@echo ... src/list.s
+	@echo ... src/maybe.obj
+	@echo ... src/maybe.i
+	@echo ... src/maybe.s
 	@echo ... src/parsehelper.obj
 	@echo ... src/parsehelper.i
 	@echo ... src/parsehelper.s

@@ -7,20 +7,18 @@
 #IncludeRegexTransform: 
 
 ../include/circuit.h
-stdbool.h
--
 stdlib.h
 -
 stdint.h
 -
-variable.h
-../include/variable.h
+list.h
+../include/list.h
 gate.h
 ../include/gate.h
+parsehelper.h
+../include/parsehelper.h
 
 ../include/gate.h
-stdbool.h
--
 stdlib.h
 -
 stdio.h
@@ -28,27 +26,55 @@ stdio.h
 variable.h
 ../include/variable.h
 
-../include/variable.h
+../include/list.h
+stdlib.h
+-
 stdbool.h
 -
-stdlib.h
--
-stdio.h
+
+../include/maybe.h
+stdbool.h
 -
 
-F:/Coding Projects/C/truthtable_c_refactor/src/truthtable.c
+../include/parsehelper.h
+stdio.h
+-
+stdbool.h
+-
+
+../include/variable.h
 stdlib.h
 -
 stdio.h
+-
+maybe.h
+../include/maybe.h
+
+F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c
+circuit.h
+F:/Coding Projects/C/truthtable_c_refactor/src/circuit.h
+stdlib.h
 -
 string.h
 -
+stdio.h
+-
 stdbool.h
 -
-ctype.h
+stdint.h
 -
-time.h
+errno.h
 -
-circuit.h
-F:/Coding Projects/C/truthtable_c_refactor/src/circuit.h
+variable.h
+F:/Coding Projects/C/truthtable_c_refactor/src/variable.h
+gate.h
+F:/Coding Projects/C/truthtable_c_refactor/src/gate.h
+list.h
+F:/Coding Projects/C/truthtable_c_refactor/src/list.h
+parsehelper.h
+F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.h
+
+F:/Coding Projects/C/truthtable_c_refactor/src/variable.c
+variable.h
+F:/Coding Projects/C/truthtable_c_refactor/src/variable.h
 

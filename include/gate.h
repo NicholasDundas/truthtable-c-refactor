@@ -1,14 +1,13 @@
 #ifndef GATE_H
 #define GATE_H
 
-#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "variable.h"
+typedef struct Circuit circuit;
 
-
-typedef enum { AND, OR, NAND, NOR, XOR, NOT, PASS, DECODER, MULTIPLEXER } kind_t; //Defines the types of gates
+typedef enum { AND, OR, NAND, NOR, XOR, NOT, PASS, DECODER, MULTIPLEXER, CIR_PTR } kind_t; //Defines the types of gates
 
 // Struct gate
 //
@@ -38,6 +37,7 @@ typedef struct {
     size_t total_size; //total size of params
     variable** params; // length determined by kind and size;
     // includes inputs and outputs, indicated by variable numbers
+    circuit* cir_ptr;
 } gate;
 
 #define GATE_PARAM_BOOL(GATE_PTR,INDEX) (GATE_PTR)->params[(INDEX)]->value
@@ -47,4 +47,20 @@ typedef struct {
 bool is_evaluable(gate g);
 
 const char* gate_type_to_char(kind_t type);
+
+
+typedef enum { GATE_RUN_SUCCESS, INVALID_GATE_PASSED, NULL_GATE_PASSED  } gate_return_err;
+
+//Debug printing of a gate
+//Example:
+//GATE: AND
+//  INPUT
+//  - [NAME: Variable1, true (0xA421F412), INPUT]
+//  - [NAME: Variable2, false (0xA421F412), INPUT]
+//  OUTPUT
+//  - [NAME: Variable3, false (0xA421F412), OUTPUT]
+void print_gate(FILE* file,gate g);
+
+//Preforms gate action on the gate pointed. returns the result 
+gate_return_err gate_return(gate* g);
 #endif

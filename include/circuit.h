@@ -33,12 +33,11 @@ typedef struct Circuit {
     //amount of output variables
     size_t input_len;
     size_t output_len;
-    char[NAME_SIZE+1] name;
+    char name[NAME_SIZE+1];
     list* circuit_dictionary; //contains circuits
 } circuit;
 
 
-typedef circuit_dictionary_entry cd_entry;
 
 #define CIRCUIT_VAR_BOOL(CIR_PTR,INDEX) (CIR_PTR)->variables[(INDEX)]->value
 

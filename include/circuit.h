@@ -37,6 +37,8 @@ typedef struct Circuit {
     char* name;
     hashtable circuit_dictionary; //contains circuits
     hashtable inherited_dictionary; //contains circuits we have inherited from the outerscope
+
+    bool defined;
 } circuit;
 
 
@@ -49,8 +51,11 @@ typedef struct Circuit {
 //Returns 0 on success or INSERT_GATE_FAILURE on failure
 int insert_var(circuit* c, var_type type, char* name, var_result value); 
 
+//sets all pointers and structures to NULL or 0 values
+void null_circuit(circuit* cir);
+
 //Initialize an Empty Circuit
-void init_circuit(circuit* cir, const char* name); 
+int init_circuit(circuit* cir, const char* name); 
 
 //Free a circuit (Must be initialized)
 void free_circuit(circuit* cir);
@@ -81,10 +86,10 @@ void in_circuit(circuit* cir,size_t in);
 
 bool defined_in_scope(circuit cir, char* name);
 
-bool defined(circuit cir, char* name);
+bool defined(circuit cir);
 
 //returns 
-circuit* get_circuit_reference(circuit c,char* name);
+circuit* get_circuit_reference(circuit* c,char* name);
 
 //debug print
 //Prints all variables followed by gates

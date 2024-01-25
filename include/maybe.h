@@ -12,20 +12,18 @@ typedef struct {
 //sets does_exist to false 
 void* reset_maybe(maybe* m);
 
-//frees data in maybe object
-maybe* free_maybe(maybe* m);
 
 //creates empty maybe and sets does_exist to false
-maybe* init_maybe();
+void init_maybe(maybe* tmp);
 
 //equivalent to init_maybe() followed by set_maybe() with data
-maybe* init_maybe_wdata(void* data);
+void* init_maybe_wdata(maybe* tmp, void* data);
 
 //checks if maybe data exists
-bool maybe_exists(const maybe* m);
+bool maybe_exists(maybe m);
 
 //returns data or NULL if does_exist is false
-void* get_data(const maybe* m);
+void* get_data(maybe m);
 
 #define get_data_cast(TYPE,maybe) (*(CAST*)get_data(maybe))
 

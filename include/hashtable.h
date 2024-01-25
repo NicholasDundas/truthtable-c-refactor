@@ -11,11 +11,14 @@ typedef struct {
     size_t entry_len;
 } hashtable;
 
-void init_hashtable(hashtable* ht, size_t (*hash)(const char*));
-void hashtable_insert(hashtable* ht,const char* key,void* data);
+int init_hashtable(hashtable* ht, size_t (*hash)(const char*));
+
+//returns 0 on insert, 1 on replace, -1 on failure (failure to allocate memory and sets errno to ENOMEM)
+int hashtable_insert(hashtable* ht,const char* key,void* data);
 void* hashtable_remove(hashtable* ht,const char* key);
 void* hashtable_get(hashtable ht,const char* key);
-void hashtable_resize(hashtable* ht, size_t newsize);
+//returns 0 on success, -1 on failure
+int hashtable_resize(hashtable* ht, size_t newsize);
 size_t hash(const char* str);
 void free_hashtable(hashtable* ht);
 

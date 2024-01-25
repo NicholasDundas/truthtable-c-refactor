@@ -36,58 +36,57 @@ int ph_ignorews(FILE* file, parse_helper* ph) {
 }
 
 //returns bytes read or EOF on error or EOF
-int readbuf_string(FILE* file,char** buf,size_t* pbufsize,parse_helper* ph) { 
+int readbuf_string(FILE* file,char** pbuf,size_t* pbufsize,parse_helper* ph) { 
     int c;
-    size_t *bufsize = pbufsize;
-    size_t count = 0;
+    //if we are passed null buffer or buffersize we just automatically allocate our own and delete at the end
+    size_t *bufsize = pbufsize ? pbufsize : calloc(1,sizeof(size_t));
+    char** buf = pbuf ? pbuf : calloc(1,sizeof(char*));
 
-    if(!bufsize) {
-        bufsize = malloc(sizeof(size_t));
-    }
-    if(buf == NULL || *bufsize < 4) {
+    size_t numwritten = 0; //number of characters written to buffer
+
+    //if either failed to allocate then cleanup the memory
+    if(!bufsize || !buf) goto NO_MEM_CLEANUP;
+    
+    if((c = ph_ignorews(file,ph)) == EOF) goto CLEANUP; //clear leading whitespace characters
+    
+    if(*buf == NULL || *bufsize < 4) { //if the buffer is less than 4
         *buf = realloc(*buf,4);
-        if(!*buf) {
-            goto NO_MEM_CLEANUP;
-        }
+        if(!(*buf)) goto NO_MEM_CLEANUP;
         *bufsize = 4;
     }
-    if((c = ph_ignorews(file,ph)) == EOF) {
-        goto CLEANUP;
-    }
-    
-    do {
-        (*buf)[count++] = c;
-        if(count == *bufsize) {
+    do { //read in character up until whitespace
+        (*buf)[numwritten++] = c;
+        if(numwritten == *bufsize) {
             *bufsize = (*bufsize << 1) - (*bufsize >> 1);
             *buf = realloc(*buf,*bufsize);
-            if(!*buf) {
-                goto NO_MEM_CLEANUP;
-            }
+            if(!*buf) goto NO_MEM_CLEANUP;
         }
     } while(!isspace(c = ph_get(file,ph)) && isprint(c));
-    (*buf)[count++] = '\0';
-    if(c != EOF) {
-        ph->lastword_pos = ph->pos - count;
-    }
-    
-    if(*bufsize > count) {
-        *bufsize = count;
+    (*buf)[numwritten++] = '\0';
+
+    if(c != EOF) ph->lastword_pos = ph->pos - numwritten;   
+
+    if(*bufsize > numwritten) { //buffer size is bigger than
+        *bufsize = numwritten;
         *buf = realloc(*buf, *bufsize);
-        if(!*buf) {
-            goto NO_MEM_CLEANUP;
-        }
+        if(!*buf) goto NO_MEM_CLEANUP;
     }
+    goto CLEANUP;
+
+    NO_MEM_CLEANUP:
+    c = EOF;
+    errno = ENOMEM;
+    if(bufsize) *bufsize = 0;
+    fprintf(stderr,"ERROR: could not allocate space for buffer when reading string\nLINE:%zu\nPOS:%zu",ph->line,ph->lastword_pos-numwritten);
 
     CLEANUP:
-    if(!pbufsize) free(bufsize);
-    return c == EOF ? EOF : count;
-    
-    NO_MEM_CLEANUP:
-    errno = ENOMEM;
-    *bufsize = 0;
-    fprintf(stderr,"ERROR: could not allocate space for buffer when reading string\nLINE:%zu\nPOS:%zu",ph->line,ph->lastword_pos-count);
-    if(!pbufsize) free(bufsize);
-    return EOF;
+    if(!pbufsize && bufsize) free(bufsize);
+    if(!pbuf && buf) {
+        if(*buf) free(*buf);
+        free(buf);
+    }
+    return c == EOF ? EOF : numwritten;
+
 }
 
 int readbuf_uint(FILE* file,char** buf,size_t* pnum,size_t* bufsize,parse_helper* ph) { 

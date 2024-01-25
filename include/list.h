@@ -22,19 +22,23 @@ typedef struct {
 void init_list(list* l);
 
 //adds data to front of list
-void list_front_insert(list* l, void* data);
+//returns 0 on success and 1 on failure
+int list_front_insert(list* l, void* data);
 
 //adds data to back of list
-void list_back_insert(list* l, void* data);
+//returns 0 on success and 1 on failure
+int list_back_insert(list* l, void* data);
 
-//adds data to back of list
-void list_insert(list* l, void* data,size_t index);
+//adds data to front of list
+//returns 0 on success and 1 on failure
+int list_insert(list* l, void* data,size_t index);
 
 //sets l[index]->data at index to data
-void list_set(list* l, void* data, size_t index);
+//returns 0 on success and 1 on failure
+int list_set(list* l, void* data, size_t index);
 
 //adds data to list via a sorting function
-void list_condition_insert(list* l,void* data , bool (*cmprfunc)(void *, void *));
+int list_condition_insert(list* l,void* data , bool (*cmprfunc)(void *, void *));
 
 //removes data from front of list and pops
 void* list_pop_front(list* l);

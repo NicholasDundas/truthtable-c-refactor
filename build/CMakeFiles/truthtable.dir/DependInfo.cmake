@@ -5,7 +5,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
   "F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/circuit.c.obj"
+  "F:/Coding Projects/C/truthtable_c_refactor/src/func.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/func.c.obj"
   "F:/Coding Projects/C/truthtable_c_refactor/src/gate.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/gate.c.obj"
+  "F:/Coding Projects/C/truthtable_c_refactor/src/hashtable.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/hashtable.c.obj"
   "F:/Coding Projects/C/truthtable_c_refactor/src/list.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/list.c.obj"
   "F:/Coding Projects/C/truthtable_c_refactor/src/maybe.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/maybe.c.obj"
   "F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.c" "F:/Coding Projects/C/truthtable_c_refactor/build/CMakeFiles/truthtable.dir/src/parsehelper.c.obj"

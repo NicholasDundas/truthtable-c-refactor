@@ -7,11 +7,11 @@
 #include "variable.h"
 typedef struct Circuit circuit;
 
-typedef enum { AND, OR, NAND, NOR, XOR, NOT, PASS, DECODER, MULTIPLEXER, CIR_PTR } kind_t; //Defines the types of gates
+typedef enum { AND, OR, NAND, NOR, XOR, NOT, PASS, DECODER, MULTIPLEXER, CIR_PTR } gate_type; //Defines the types of gates
 
 // Struct gate
 //
-// kind_t kind is an enum that defines the type of gate we are looking at
+// gate_type kind is an enum that defines the type of gate we are looking at
 // size is used for either the decoder or multiplexer to determine its size
 // params holds pointers to integers so that mutliple Gates may point to the same variable
 //
@@ -32,7 +32,7 @@ typedef enum { AND, OR, NAND, NOR, XOR, NOT, PASS, DECODER, MULTIPLEXER, CIR_PTR
 // MULTIPLEXER
 //
 typedef struct {
-    kind_t kind; //type of gate
+    gate_type kind; //type of gate
     size_t size; // indicates size of inputs
     size_t total_size; //total size of params
     variable** params; // length determined by kind and size;
@@ -46,7 +46,7 @@ typedef struct {
 //returns true if all inputs have been evaluated before otherwise false
 bool is_evaluable(gate g);
 
-const char* gate_type_to_char(kind_t type);
+const char* gate_type_to_char(gate_type type);
 
 
 typedef enum { GATE_RUN_SUCCESS, INVALID_GATE_PASSED, NULL_GATE_PASSED  } gate_return_err;

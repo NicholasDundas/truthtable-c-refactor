@@ -13,6 +13,8 @@ stdint.h
 -
 list.h
 ../include/list.h
+hashtable.h
+../include/hashtable.h
 gate.h
 ../include/gate.h
 parsehelper.h
@@ -25,6 +27,12 @@ stdio.h
 -
 variable.h
 ../include/variable.h
+
+../include/hashtable.h
+string.h
+-
+list.h
+../include/list.h
 
 ../include/list.h
 stdlib.h
@@ -71,10 +79,8 @@ gate.h
 F:/Coding Projects/C/truthtable_c_refactor/src/gate.h
 list.h
 F:/Coding Projects/C/truthtable_c_refactor/src/list.h
+hashtable.h
+F:/Coding Projects/C/truthtable_c_refactor/src/hashtable.h
 parsehelper.h
 F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.h
-
-F:/Coding Projects/C/truthtable_c_refactor/src/variable.c
-variable.h
-F:/Coding Projects/C/truthtable_c_refactor/src/variable.h
 

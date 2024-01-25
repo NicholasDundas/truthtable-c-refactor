@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "list.h"
+#include "hashtable.h"
 #include "gate.h"
 #include "parsehelper.h"
 
@@ -33,8 +34,9 @@ typedef struct Circuit {
     //amount of output variables
     size_t input_len;
     size_t output_len;
-    char name[NAME_SIZE+1];
-    list* circuit_dictionary; //contains circuits
+    char* name;
+    hashtable circuit_dictionary; //contains circuits
+    hashtable inherited_dictionary; //contains circuits we have inherited from the outerscope
 } circuit;
 
 
@@ -45,10 +47,10 @@ typedef struct Circuit {
 //Attempts to insert a variable into c
 //Maximum length of name is defined by NAME_SIZE in variable.h
 //Returns 0 on success or INSERT_GATE_FAILURE on failure
-int insert_var(circuit* c, type_t type, char* name, bool value); 
+int insert_var(circuit* c, var_type type, char* name, var_result value); 
 
 //Initialize an Empty Circuit
-circuit* init_circuit(void); 
+void init_circuit(circuit* cir, const char* name); 
 
 //Free a circuit (Must be initialized)
 void free_circuit(circuit* cir);
@@ -59,13 +61,13 @@ void free_circuit(circuit* cir);
 //Returns var_len of circuit on failure or GET_VAR_NULL_PASSED if a null was passed to either parameter
 size_t get_var(circuit* c, char* name); 
 
-//converts kind_t to char
-const char* gate_type_to_char(kind_t type);
+//converts gate_type to char
+const char* gate_type_to_char(gate_type type);
 
 #define INSERT_VAR_FAILURE 1
 //attempts to add gate type of kind to c and returns 0 on success or 1 on failure
 //size and params must match with gate type or UB will occur
-int insert_gate(circuit* c, kind_t kind, variable** params, size_t size, size_t total_size,circuit* cir); 
+int insert_gate(circuit* c, gate_type kind, variable** params, size_t size, size_t total_size,circuit* cir); 
 
 
 //reset all temp variables to initial states
@@ -77,6 +79,12 @@ size_t out_circuit(circuit* cir);
 //Input a circuit, any bits bigger than 2^(input_len) are truncated and ignored
 void in_circuit(circuit* cir,size_t in);
 
+bool defined_in_scope(circuit cir, char* name);
+
+bool defined(circuit cir, char* name);
+
+//returns 
+circuit* get_circuit_reference(circuit c,char* name);
 
 //debug print
 //Prints all variables followed by gates
@@ -87,5 +95,6 @@ void print_circuit(FILE* file,circuit* cir);
 circuit* read_from_file_name(char *filename); 
 
 //read in a circuit from a file
-circuit* read_from_file(FILE* finput, parse_helper* ph,list* cir_dictionary_param);
+//if circuit is NULL then it has failed and buf is set to the last line where bufptr is the position of the line and linenumber is the next line
+bool parse_statement(FILE* finput, char** buf,size_t* bufsize,parse_helper*ph,circuit* c);
 #endif

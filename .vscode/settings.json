@@ -18,6 +18,9 @@
         "array": "c",
         "string": "c",
         "string_view": "c",
-        "circuit.h": "c"
+        "circuit.h": "c",
+        "initializer_list": "c",
+        "list.h": "c",
+        "hashtable.h": "c"
     },
 }

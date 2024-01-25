@@ -9,7 +9,7 @@ bool input_friendly(variable v) {
 }
 
 
-const char* variable_type_to_char(type_t type) {
+const char* variable_type_to_char(var_type type) {
     switch(type) {
         case INPUT:
             return "INPUT";

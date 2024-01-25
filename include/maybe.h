@@ -22,10 +22,10 @@ maybe* init_maybe();
 maybe* init_maybe_wdata(void* data);
 
 //checks if maybe data exists
-bool maybe_exists(maybe m);
+bool maybe_exists(const maybe* m);
 
 //returns data or NULL if does_exist is false
-void* get_data(maybe m);
+void* get_data(const maybe* m);
 
 #define get_data_cast(TYPE,maybe) (*(CAST*)get_data(maybe))
 

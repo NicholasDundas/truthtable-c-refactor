@@ -30,18 +30,18 @@ maybe *init_maybe_wdata(void *data)
     return tmp;
 }
 
-bool maybe_exists(maybe m)
+bool maybe_exists(const maybe* m)
 {
-    return m.does_exist;
+    return m->does_exist;
 }
 
-void *get_data(maybe m)
+void *get_data(const maybe* m)
 {
-    return m.does_exist ? m.data : NULL;
+    return m->does_exist ? m->data : NULL;
 }
 
 void* set_maybe(maybe *m, void *data) {
-    if(maybe_exists(*m)) {
+    if(maybe_exists(m)) {
         free(m->data);
     }
     m->does_exist = true;

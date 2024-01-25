@@ -17,9 +17,9 @@
 #include <ctype.h>
 #include <time.h>
 
-#include "circuit.h"
+#include "hashtable.h"
 
-
+/*
 int main(int argc, char** argv) {
     if (argc < 2) {
         fprintf(stderr, "usage : %s <FILE_NAME>\n", argv[0]);
@@ -54,4 +54,28 @@ int main(int argc, char** argv) {
             fclose(output);
     fprintf(stdout,"Time taken: %lf\n", difftime(time(NULL), start));
     return EXIT_SUCCESS;
+}
+*/
+#include "func.h"
+
+int main() {
+    hashtable intlist;
+    init_hashtable(&intlist,hash);
+    int x = 1;
+    int y = 5;
+    int z = -3;
+    char* names[] = {"nick", "bern", "christian"};
+    hashtable_insert(&intlist,names[0],&x);
+    hashtable_insert(&intlist,names[1],&y);
+    hashtable_insert(&intlist,names[2],&z);
+
+    for(size_t i = 0; i < 3; ++i) {
+        printf("%d ",*(int*)hashtable_get(intlist,names[i]));
+    }
+    printf("\nhashtable ptr of z is %p and ptr of y is %p\n",hashtable_get(intlist,names[2]),hashtable_get(intlist,names[1]));
+    hashtable_remove(&intlist,names[2]);
+    printf("ptr of z is %p\n",hashtable_get(intlist,names[2]));
+    hashtable_resize(&intlist,16);
+    printf("ptr of y is %p\n",hashtable_get(intlist,names[1]));
+    free_hashtable(&intlist);
 }

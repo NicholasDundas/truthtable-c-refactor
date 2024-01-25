@@ -17,10 +17,7 @@ typedef struct {
 
 //creates a parse_helper struct
 //sets line,pos, and lastword_pos to 1
-parse_helper* init_ph();
-
-//frees a parse_helper struct
-void free_ph(parse_helper* ph);
+void init_ph(parse_helper* tmp);
 
 //simple fgetc wrapper to increment ph as needed
 //lines is increased for every '\n' and pos is set back to zero
@@ -37,15 +34,9 @@ int ph_ignorews(FILE* file, parse_helper* ph) ;
 //assumes buffer is large enough to handle the string
 //returns 0 if input is bigger than buffer
 //returns -1 if read EOF and on success or 1 on just success
-int readbuf_string(FILE* file,char* buf,size_t maxchr,parse_helper* ph);
+int readbuf_string(FILE* file,char** buf,size_t* pbufsize,parse_helper* ph);
 
-//attempts to read an unsigned long int to pnum
-//limited by maxchr and increments the parse_helper to keep track of line and current character
-//assumes buffer is large enough to handle the string
-//returns 0 if input is bigger than buffer
-//returns -1 if read EOF and on success or 1 on just success
-int readbuf_uint(FILE* file,size_t* pnum,size_t maxchr, parse_helper* ph);
+int readbuf_uint(FILE* file,char** buf,size_t* pnum,size_t* bufsize,parse_helper* ph);
 
-bool is_consect_digit(char* buf);
 
 #endif

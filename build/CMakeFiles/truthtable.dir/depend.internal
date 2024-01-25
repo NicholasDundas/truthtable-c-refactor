@@ -4,19 +4,28 @@
 CMakeFiles/truthtable.dir/src/circuit.c.obj
  ../include/circuit.h
  ../include/gate.h
+ ../include/hashtable.h
  ../include/list.h
  ../include/maybe.h
  ../include/parsehelper.h
  ../include/variable.h
  F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c
+CMakeFiles/truthtable.dir/src/func.c.obj
+ ../include/func.h
+ F:/Coding Projects/C/truthtable_c_refactor/src/func.c
 CMakeFiles/truthtable.dir/src/gate.c.obj
  ../include/circuit.h
  ../include/gate.h
+ ../include/hashtable.h
  ../include/list.h
  ../include/maybe.h
  ../include/parsehelper.h
  ../include/variable.h
  F:/Coding Projects/C/truthtable_c_refactor/src/gate.c
+CMakeFiles/truthtable.dir/src/hashtable.c.obj
+ ../include/hashtable.h
+ ../include/list.h
+ F:/Coding Projects/C/truthtable_c_refactor/src/hashtable.c
 CMakeFiles/truthtable.dir/src/list.c.obj
  ../include/list.h
  F:/Coding Projects/C/truthtable_c_refactor/src/list.c
@@ -27,12 +36,9 @@ CMakeFiles/truthtable.dir/src/parsehelper.c.obj
  ../include/parsehelper.h
  F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.c
 CMakeFiles/truthtable.dir/src/truthtable.c.obj
- ../include/circuit.h
- ../include/gate.h
+ ../include/func.h
+ ../include/hashtable.h
  ../include/list.h
- ../include/maybe.h
- ../include/parsehelper.h
- ../include/variable.h
  F:/Coding Projects/C/truthtable_c_refactor/src/truthtable.c
 CMakeFiles/truthtable.dir/src/variable.c.obj
  ../include/maybe.h

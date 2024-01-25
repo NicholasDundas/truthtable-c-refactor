@@ -563,6 +563,33 @@ src/circuit.c.s:
 	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/circuit.c.s
 .PHONY : src/circuit.c.s
 
+src/func.obj: src/func.c.obj
+
+.PHONY : src/func.obj
+
+# target to build an object file
+src/func.c.obj:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/func.c.obj
+.PHONY : src/func.c.obj
+
+src/func.i: src/func.c.i
+
+.PHONY : src/func.i
+
+# target to preprocess a source file
+src/func.c.i:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/func.c.i
+.PHONY : src/func.c.i
+
+src/func.s: src/func.c.s
+
+.PHONY : src/func.s
+
+# target to generate assembly for a file
+src/func.c.s:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/func.c.s
+.PHONY : src/func.c.s
+
 src/gate.obj: src/gate.c.obj
 
 .PHONY : src/gate.obj
@@ -589,6 +616,33 @@ src/gate.s: src/gate.c.s
 src/gate.c.s:
 	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/gate.c.s
 .PHONY : src/gate.c.s
+
+src/hashtable.obj: src/hashtable.c.obj
+
+.PHONY : src/hashtable.obj
+
+# target to build an object file
+src/hashtable.c.obj:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/hashtable.c.obj
+.PHONY : src/hashtable.c.obj
+
+src/hashtable.i: src/hashtable.c.i
+
+.PHONY : src/hashtable.i
+
+# target to preprocess a source file
+src/hashtable.c.i:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/hashtable.c.i
+.PHONY : src/hashtable.c.i
+
+src/hashtable.s: src/hashtable.c.s
+
+.PHONY : src/hashtable.s
+
+# target to generate assembly for a file
+src/hashtable.c.s:
+	$(MAKE) -f CMakeFiles\truthtable.dir\build.make CMakeFiles/truthtable.dir/src/hashtable.c.s
+.PHONY : src/hashtable.c.s
 
 src/list.obj: src/list.c.obj
 
@@ -768,9 +822,15 @@ help:
 	@echo ... src/circuit.obj
 	@echo ... src/circuit.i
 	@echo ... src/circuit.s
+	@echo ... src/func.obj
+	@echo ... src/func.i
+	@echo ... src/func.s
 	@echo ... src/gate.obj
 	@echo ... src/gate.i
 	@echo ... src/gate.s
+	@echo ... src/hashtable.obj
+	@echo ... src/hashtable.i
+	@echo ... src/hashtable.s
 	@echo ... src/list.obj
 	@echo ... src/list.i
 	@echo ... src/list.s

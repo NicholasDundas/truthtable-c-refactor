@@ -7,16 +7,15 @@
 #include "maybe.h"
 
 //Maximum length of name of a variable including null terminator
-#define NAME_SIZE (size_t)64 
 
 //Defines the types of variables
-typedef enum { INPUT, TEMP, OUTPUT, CONST, DISCARD } type_t; 
+typedef enum { INPUT, TEMP, OUTPUT, CONST, DISCARD } var_type; 
 typedef enum { var_false = 0, var_true = 1, var_uneval} var_result;
 // Holds information about name, type, and a boolean in the heap
 typedef struct {
-    char letter[NAME_SIZE + 1]; //name of variable
+    char *letter; //name of variable
     var_result value; //holds value
-    type_t type; //type of variable
+    var_type type; //type of variable
 } variable;
 
 //returns whether a value is OUTPUT, DISCARD, or TEMP
@@ -35,6 +34,6 @@ void print_var(FILE* file,variable* v);
 //[true (0xA421F412)]
 void print_bool(FILE* file,bool* v);
 
-//converts type_t to a string
-const char* variable_type_to_char(type_t type);
+//converts var_type to a string
+const char* variable_type_to_char(var_type type);
 #endif

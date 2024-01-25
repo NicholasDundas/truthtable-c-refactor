@@ -43,7 +43,7 @@ bool is_evaluable(gate g) {
     }
 }
 
-const char* gate_type_to_char(kind_t type) {
+const char* gate_type_to_char(gate_type type) {
    switch (type) {
         case NOT:
             return "NOT";

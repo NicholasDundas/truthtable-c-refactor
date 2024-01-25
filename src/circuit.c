@@ -59,7 +59,9 @@ void null_circuit(circuit* cir) {
 }
 
 int init_circuit(circuit* cir, const char* name) {
-    if (cir != NULL) {
+    if (cir) {
+        cir->defined = false;
+        
         null_circuit(cir);
         cir->gate_cap = 2;
         cir->gates = malloc(sizeof(gate) * cir->gate_cap);;
@@ -91,8 +93,8 @@ int init_circuit(circuit* cir, const char* name) {
 
         CLEANUP:
         free_circuit(cir);
-        return 1;
     }
+    return 1;
 }
 
 void free_circuit(circuit* cir) {
@@ -106,7 +108,8 @@ void free_circuit(circuit* cir) {
         }
         free(cir->gates);
         free_hashtable(&cir->circuit_dictionary);
-        free(cir);
+        free_hashtable(&cir->inherited_dictionary);
+        free(cir->name);
     }
 }
 
@@ -135,17 +138,23 @@ void in_circuit(circuit *cir, size_t in) {
     }
 }
 
-circuit* get_circuit_reference(circuit cir,char* name) {
-    circuit* tmp = hashtable_get(cir.circuit_dictionary,name);
-    return tmp ? tmp : hashtable_get(cir.inherited_dictionary,name);
+circuit* get_circuit_reference(circuit* cir,char* name) {
+    circuit* tmp = hashtable_get(cir->circuit_dictionary,name);
+    if(!tmp) tmp = hashtable_get(cir->inherited_dictionary,name);
+    if(!tmp && strcmp(cir->name,name) == 0) tmp = cir;
+    return tmp;
 }
 
-bool defined_in_scope(circuit cir, char *name) {
+bool declared_in_scope(circuit cir, char *name) {
     return hashtable_get(cir.circuit_dictionary,name) != NULL;
 }
 
-bool defined(circuit cir, char *name) {
-    return get_circuit_reference(cir,name) != NULL;
+bool declared(circuit cir, char *name) {
+    return get_circuit_reference(&cir,name) != NULL;
+}
+
+bool defined(circuit cir) {
+    return cir.var_len > 3;
 }
 
 void print_circuit(FILE *file, circuit *cir)
@@ -216,29 +225,40 @@ circuit* read_from_file_name(char *filename) {
     return cir;
 }
 
-bool parse_statement(FILE* finput, char** buf,size_t* bufsize,parse_helper*ph,circuit* c) {
+circuit* read_func_header(FILE* finput, char** buf, size_t* bufsize, parse_helper* ph, circuit* outer_cir) {
+    errno = 0;
+    int res = readbuf_string(finput,buf,bufsize,ph);
+    if(res < 0) {
+        if(feof(finput)) {
+            fprintf(stderr,"ERROR: Unexpected end of file. \nLINE:%zu\nPOSITION:%zu\n",(*buf),ph->line,ph->lastword_pos - *bufsize);
+        }
+    }
+    char* reserved_names[] = {"FUNC", "CONST", "AND", "NAND", "OR", "NOR","XOR", "DECODER","NOT","MULTIPLEXER","PASS","INPUT", "OUTPUT", "_","1","0"};
+    for(size_t i = 0; i < sizeof(reserved_names)/sizeof(char*); ++i) {
+        if(strcmp(*buf,reserved_names[i]) == 0) {
+            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is reserved\nLINE:%zu\nPOSITION:%zu\n",(*buf),ph->line,ph->lastword_pos - *bufsize);
+            return NULL;
+        }
+    }
+    circuit* func = get_circuit_reference(outer_cir,buf);
+    if(func) {
+        if(defined(*func)) {
+            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is already defined\nLINE:%zu\nPOSITION:%zu\n",(*buf),ph->line,ph->lastword_pos - *bufsize);
+            return NULL;
+        }
+    } else {
+        func = malloc(sizeof(circuit));
+        if(init_circuit(func,buf)) return NULL;
+    }
+}
 
-    char* reserved_names[] = {"FUNC", "CONST", "AND", "NAND", "OR", "NOR","XOR", "DECODER","NOT","MULTIPLEXER","PASS","INPUT", "OUTPUT", "_","TRUE","FALSE"};
+bool parse_statement(FILE* finput, char** buf,size_t* bufsize,parse_helper*ph,circuit* c) {
     
     while(readbuf_string(finput,buf,bufsize,ph) > 0) {
         if(strcmp(*buf,"FUNC") == 0) { //We are parsing a Function Declaration or Definition
-            circuit* cir = read_func_header(finput,buf,bufsize,ph);
+            circuit* cir = read_func_header(finput,buf,bufsize,ph,c);
             if(cir) {
-                bool is_available = true;
-                int res = readbuf_string(finput,buf,bufsize,ph);
-                if(res > 0) {
-                    if(strcmp(*buf,c->name) == 0 && c->gate_len > 0) {
-                        fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is already defined\nLINE:%zu\nPOSITION:%zu\n",(*buf),ph->line,ph->lastword_pos - *bufsize);
-                        is_available = false;
-                    }
-                    for(size_t i = 0; i < sizeof(reserved_names)/sizeof(char*); ++i) {
-                        if(strcmp(*buf,reserved_names[i]) == 0) {
-                            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is reserved\nLINE:%zu\nPOSITION:%zu\n",(*buf),ph->line,ph->lastword_pos - *bufsize);
-                            is_available = false;
-                            break;
-                        }
-                    }    
-                }
+                
             }
         }
     }

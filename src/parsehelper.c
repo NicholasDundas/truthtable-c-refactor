@@ -42,7 +42,7 @@ int readbuf_string(FILE* file,char** pbuf,size_t* pbufsize,parse_helper* ph) {
     size_t *bufsize = pbufsize ? pbufsize : calloc(1,sizeof(size_t));
     char** buf = pbuf ? pbuf : calloc(1,sizeof(char*));
 
-    size_t numwritten = 0; //number of characters written to buffer
+    int numwritten = 0; //number of characters written to buffer
 
     //if either failed to allocate then cleanup the memory
     if(!bufsize || !buf) goto NO_MEM_CLEANUP;
@@ -92,7 +92,7 @@ int readbuf_string(FILE* file,char** pbuf,size_t* pbufsize,parse_helper* ph) {
 int readbuf_uint(FILE* file,char** buf,size_t* pnum,size_t* bufsize,parse_helper* ph) { 
     int c;
     errno = 0;
-    if((c = readbuf_string(file,buf,bufsize,ph)) != 0 && *bufsize > 0 && (*buf)[0] != '-') {
+    if((c = readbuf_string(file,buf,bufsize,ph)) > 0 && (*buf)[0] != '-') {
         char* ptr;
         errno = 0;
         *pnum = strtoull((*buf),&ptr,10);
@@ -100,12 +100,12 @@ int readbuf_uint(FILE* file,char** buf,size_t* pnum,size_t* bufsize,parse_helper
             errno = EINVAL;
         }
         if(errno != ERANGE) {
-            return c == EOF ? EOF : 1;
+            return c == EOF ? EOF : 0;
         }
     } else if (*bufsize > 0) {
         fprintf(stderr,"ERROR: Invalid positive integer given\nBUFFER:\"%s\"\nLINE:%zu\nPOSITION:%zu\n",(*buf),ph->line,ph->lastword_pos - *bufsize);
     }
-    return 0;
+    return 1;
 }
 
 int readbuf_long(FILE* file,char** buf,long* pnum,size_t* bufsize,parse_helper* ph) { 

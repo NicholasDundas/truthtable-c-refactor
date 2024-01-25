@@ -29,11 +29,10 @@ int ph_get(FILE* file, parse_helper* ph);
 //returns last character found or -1 if EOF
 int ph_ignorews(FILE* file, parse_helper* ph) ;
 
-//attempts to read a string from file into a buffer
-//limited by maxchr and increments the parse_helper to keep track of line and current character
-//assumes buffer is large enough to handle the string
-//returns 0 if input is bigger than buffer
-//returns -1 if read EOF and on success or 1 on just success
+//Reads the next string of characters until it encounters a space or EOF
+//It will automatically allocate space for buf and set pbufsize to the length of buf including the null terminator
+//If either is NULL the result is discarded
+//Returns number of bytes read or -1 if it fails (Memory Allocation failure) or encounters EOF
 int readbuf_string(FILE* file,char** buf,size_t* pbufsize,parse_helper* ph);
 
 int readbuf_uint(FILE* file,char** buf,size_t* pnum,size_t* bufsize,parse_helper* ph);

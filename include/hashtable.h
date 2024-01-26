@@ -11,7 +11,7 @@ typedef struct {
     size_t entry_len;
 } hashtable;
 
-int init_hashtable(hashtable* ht, size_t (*hash)(const char*));
+void init_hashtable(hashtable* ht, size_t (*hash)(const char*));
 
 //returns 0 on insert, 1 on replace, -1 on failure (failure to allocate memory and sets errno to ENOMEM)
 int hashtable_insert(hashtable* ht,const char* key,void* data);

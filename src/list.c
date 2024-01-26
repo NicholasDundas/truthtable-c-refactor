@@ -133,7 +133,7 @@ void* list_pop_index(list* l,size_t index) {
 
 list_node* list_indexof_mem(list l, void *obj, size_t size) {   
     list_node* node = l.head;
-    while(node != NULL && memcmp(node->data,obj,size)) {
+    while(node && memcmp(node->data,obj,size)) {
         node = node->next;
     }
     return node;
@@ -141,18 +141,21 @@ list_node* list_indexof_mem(list l, void *obj, size_t size) {
 
 list_node* list_indexof_cmpr(list l, void *obj, bool (*cmprfunc)(void *, void *)) {
     list_node* node = l.head;
-    while(node != NULL && !cmprfunc(obj,node->data)) {
+    while(node && !cmprfunc(obj,node->data)) {
         node = node->next;
     }
     return node;
 }
 
-void free_list(list* list) {
-    list_node* node = list->head;
-    while (node != NULL) {
-        list_node* next_node = node->next;
-        free(node);
-        node = next_node;
+void free_list(list* l) {
+    if(l) {
+        list_node* node = l->head;
+        while (--l->size) {
+            list_node* next_node = node->next;
+            free(node);
+            node = next_node;
+        }
+        l->head = NULL;
     }
 }
 

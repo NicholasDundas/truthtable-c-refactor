@@ -21,7 +21,11 @@
         "circuit.h": "c",
         "initializer_list": "c",
         "list.h": "c",
-        "hashtable.h": "c"
+        "hashtable.h": "c",
+        "compare": "c",
+        "functional": "c",
+        "tuple": "c",
+        "utility": "c"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/clang",
 }

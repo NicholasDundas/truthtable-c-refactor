@@ -14,6 +14,9 @@
 //Defines the array index where input variables begin
 #define CIRCUIT_CONST_OFFSET (size_t)3
 
+//whether a circuit is initialized, declared, or defined
+typedef enum { cir_init,cir_declared, cir_defined, cir_freed} cir_type; 
+
 //Circuit struct to hold information about gates and variables
 typedef struct Circuit {
     gate* gates; //All Gates
@@ -38,23 +41,18 @@ typedef struct Circuit {
     hashtable circuit_dictionary; //contains circuits
     hashtable inherited_dictionary; //contains circuits we have inherited from the outerscope
 
-    bool defined;
+    cir_type type;
 } circuit;
-
 
 
 #define CIRCUIT_VAR_BOOL(CIR_PTR,INDEX) (CIR_PTR)->variables[(INDEX)]->value
 
-#define INSERT_GATE_FAILURE 1
 //Attempts to insert a variable into c
-//Maximum length of name is defined by NAME_SIZE in variable.h
-//Returns 0 on success or INSERT_GATE_FAILURE on failure
+//Returns 1 on success or 0 on failure
 int insert_var(circuit* c, var_type type, char* name, var_result value); 
 
-//sets all pointers and structures to NULL or 0 values
-void null_circuit(circuit* cir);
-
 //Initialize an Empty Circuit
+//returns 1 on success or 0 on failure
 int init_circuit(circuit* cir, const char* name); 
 
 //Free a circuit (Must be initialized)
@@ -84,12 +82,14 @@ size_t out_circuit(circuit* cir);
 //Input a circuit, any bits bigger than 2^(input_len) are truncated and ignored
 void in_circuit(circuit* cir,size_t in);
 
-bool defined_in_scope(circuit cir, char* name);
+//returns whether a circuit with an equivalent name exists in the circuit dictionary
+bool declared_in_scope(circuit cir, char* name);
 
-bool defined(circuit cir);
+//returns whether a circuit with an equivalent name exists in the circuit dictionary or the inherited one
+bool declared(circuit cir,char* name);
 
 //returns 
-circuit* get_circuit_reference(circuit* c,char* name);
+circuit* get_circuit_reference(const circuit* c,char* name);
 
 //debug print
 //Prints all variables followed by gates
@@ -99,7 +99,9 @@ void print_circuit(FILE* file,circuit* cir);
 //read in a circuit from a file
 circuit* read_from_file_name(char *filename); 
 
-//read in a circuit from a file
-//if circuit is NULL then it has failed and buf is set to the last line where bufptr is the position of the line and linenumber is the next line
-bool parse_statement(FILE* finput, char** buf,size_t* bufsize,parse_helper*ph,circuit* c);
+//parses a statement
+//0 is failure
+//1 is success
+//2 is end of a circuit function statement
+int parse_statement(FILE* finput, char** buf,size_t* bufsize,parse_helper*ph,circuit* c);
 #endif

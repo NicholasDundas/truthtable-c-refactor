@@ -73,13 +73,13 @@ int readbuf_string(FILE* file,char** pbuf,size_t* pbufsize,parse_helper* ph) {
     }
     goto CLEANUP;
 
-    NO_MEM_CLEANUP:
+NO_MEM_CLEANUP:
     c = EOF;
     errno = ENOMEM;
     if(bufsize) *bufsize = 0;
-    fprintf(stderr,"ERROR: could not allocate space for buffer when reading string\nLINE:%zu\nPOS:%zu",ph->line,ph->lastword_pos-numwritten);
+    fprintf(stderr,"ERROR: Could not allocate space for buffer when reading string\nLINE:%zu\nPOS:%zu",ph->line,ph->lastword_pos-numwritten);
 
-    CLEANUP:
+CLEANUP:
     if(!pbufsize && bufsize) free(bufsize);
     if(!pbuf && buf) {
         if(*buf) free(*buf);
@@ -145,3 +145,4 @@ int readbuf_llong(FILE* file,char** buf,long long* pnum,size_t* bufsize,parse_he
     }
     return 0;
 }
+

@@ -84,3 +84,35 @@ F:/Coding Projects/C/truthtable_c_refactor/src/hashtable.h
 parsehelper.h
 F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.h
 
+F:/Coding Projects/C/truthtable_c_refactor/src/gate.c
+gate.h
+F:/Coding Projects/C/truthtable_c_refactor/src/gate.h
+stdlib.h
+-
+stdbool.h
+-
+stdio.h
+-
+string.h
+-
+circuit.h
+F:/Coding Projects/C/truthtable_c_refactor/src/circuit.h
+
+F:/Coding Projects/C/truthtable_c_refactor/src/hashtable.c
+hashtable.h
+F:/Coding Projects/C/truthtable_c_refactor/src/hashtable.h
+errno.h
+-
+
+F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.c
+parsehelper.h
+F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.h
+stdlib.h
+-
+ctype.h
+-
+string.h
+-
+errno.h
+-
+

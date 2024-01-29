@@ -3,47 +3,17 @@
         {
             "name": "Win32",
             "includePath": [
-                "f:/Coding Projects/C/truthtable_c_refactor/**"
-            ],
-            "defines": [],
-            "cStandard": "c11",
-            "cppStandard": "c++14",
-            "intelliSenseMode": "linux-clang-x64",
-            "configurationProvider": "ms-vscode.makefile-tools",
-            "browse": {
-                "limitSymbolsToIncludedHeaders": true,
-                "path": [
-                    "f:/Coding Projects/C/truthtable_c_refactor/**",
-                    "${workspaceFolder}"
-                ]
-            },
-            "configurationProviderInCppPropertiesJson": "ms-vscode.makefile-tools",
-            "mergeConfigurations": false,
-            "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe"
-        },
-        {
-            "name": "Win32",
-            "includePath": [
-                "f:/Coding Projects/C/truthtable_c_refactor/**"
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            "cStandard": "c11",
+            "cStandard": "c17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "windows-gcc-x64",
-            "mergeConfigurations": false,
-            "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",
-            "browse": {
-                "path": [
-                    "f:/Coding Projects/C/truthtable_c_refactor/**",
-                    "f:/Coding Projects/C/truthtable_c_refactor"
-                ],
-                "limitSymbolsToIncludedHeaders": true
-            },
-            "compilerPathInCppPropertiesJson": "C:/Program Files/LLVM/bin/clang.exe"
+            "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe"
         }
     ],
     "version": 4

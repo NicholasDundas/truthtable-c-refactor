@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="Win32-mingw32-make"
+	BuildStamp="20240128-0309-Experimental"
+	Name="DUNDYPC"
+	Generator="ctest-3.17.0-rc2"
+	CompilerName="C:/msys64/ucrt64/bin/g++.exe"
+	CompilerVersion=""
+	OSName="Windows"
+	Hostname="DundyPC"
+	OSRelease=" Personal"
+	OSVersion=" (Build 19045)"
+	OSPlatform="AMD64"
+	Is64Bits="1"
+	VendorString="AuthenticAMD"
+	VendorID="Advanced Micro Devices"
+	FamilyID="15"
+	ModelID="1"
+	ProcessorCacheSize="64"
+	NumberOfLogicalCPU="12"
+	NumberOfPhysicalCPU="6"
+	TotalVirtualMemory="42665"
+	TotalPhysicalMemory="32699"
+	LogicalProcessorsPerPhysical="2"
+	ProcessorClockFrequency="5304"
+	>
+	<Testing>
+		<StartDateTime>Jan 27 22:09 Eastern Standard Time</StartDateTime>
+		<StartTestTime>1706411384</StartTestTime>
+		<TestList/>
+		<EndDateTime>Jan 27 22:09 Eastern Standard Time</EndDateTime>
+		<EndTestTime>1706411384</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

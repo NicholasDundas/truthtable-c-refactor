@@ -9,20 +9,19 @@
 typedef struct {
     size_t line;
     size_t pos;
-    size_t lastword_pos; //points to the last letter after a word
-
+    size_t wrd_end; //points to the last character after a word
 } parse_helper;
 
 
 
 //creates a parse_helper struct
-//sets line,pos, and lastword_pos to 1
+//sets line,pos, and wrd_end to 1
 void init_ph(parse_helper* tmp);
 
 //simple fgetc wrapper to increment ph as needed
 //lines is increased for every '\n' and pos is set back to zero
 //else pos is incremented by 1
-//returns -1 on EOF otherwise returns character
+//returns -1 on EOF or lastwrd malloc fail otherwise returns character
 int ph_get(FILE* file, parse_helper* ph);
 
 //removes preceding whitespace

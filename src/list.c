@@ -25,6 +25,7 @@ int list_front_insert(list* l, void* data) {
     if(!temp_node) {
         return 1;
     }
+
     l->head = temp_node;
     if(l->back == NULL) {
         l->back = l->head;
@@ -41,6 +42,7 @@ int list_insert(list *l, void *data, size_t index) {
     } else if (index < l->size) {
         list_node* temp_node = init_lnode(NULL, data);
         if(!temp_node) return 1;
+
         list_node* traverse = l->head; 
         while(--index) {
             traverse = traverse->next;
@@ -73,7 +75,10 @@ int list_back_insert(list *l, void *data) {
         return list_front_insert(l, data);
     } else {
         l->head->next = init_lnode(NULL, data);
-        if(!l->head->next) return 1;
+        if(!l->head->next) {
+            return 1;
+        }
+
         l->back = l->head->next;
         l->size++;
         return 0;
@@ -85,6 +90,10 @@ int list_condition_insert(list *l, void *data, bool (*cmprfunc)(void *, void *))
         return list_front_insert(l,data);
     } else {
         list_node* temp_node = init_lnode(NULL, data);
+        if(!temp_node) {
+            return 1;
+        }
+
         list_node* traverse = l->head; 
         while(traverse->next && cmprfunc(data,traverse->data)) {
             traverse = traverse->next;

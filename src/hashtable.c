@@ -31,10 +31,10 @@ static inline int init_hashnode(hashtable_node* htn,void* data, const char* key)
     htn->key = malloc(keylen);
     if(!htn->key) {
         errno = ENOMEM;
-        return 0;
+        return 1;
     }
     memcpy(htn->key,key,keylen);
-    return 1;
+    return 0;
 }
 
 int hashtable_insert(hashtable* ht,const char *key,void *data) {
@@ -52,6 +52,7 @@ int hashtable_insert(hashtable* ht,const char *key,void *data) {
     if (ht->entries[index].size == 0 || !(list_index = list_indexof_cmpr(ht->entries[index],(void*)key,hashnode_key_cmpr))) {
         hashtable_node* tmp = malloc(sizeof(hashtable_node));
         if(!tmp || !init_hashnode(tmp,data,key)) {
+            free(tmp);
             return -1;
         }  
         list_front_insert(&ht->entries[index],tmp);

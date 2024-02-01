@@ -10,6 +10,12 @@ typedef struct list_node {
     struct list_node* next;
 } list_node;
 
+typedef struct {
+    list_node* node;
+    size_t index;
+} list_node_info;
+
+
 //stores data and information about the list
 typedef struct {
     size_t size;
@@ -29,30 +35,33 @@ int list_front_insert(list* l, void* data);
 //returns 0 on success and 1 on failure
 int list_back_insert(list* l, void* data);
 
-//adds data to front of list
+//adds to at index
 //returns 0 on success and 1 on failure
 int list_insert(list* l, void* data,size_t index);
 
-//sets l[index]->data at index to data
+//sets the data at the given index
 //returns 0 on success and 1 on failure
 int list_set(list* l, void* data, size_t index);
 
-//adds data to list via a sorting function
+//adds data to list after the first failure of the comparison function
+//returns 0 on success and 1 on failure
 int list_condition_insert(list* l,void* data , bool (*cmprfunc)(void *, void *));
 
 //removes data from front of list and pops
+//returns data popped
 void* list_pop_front(list* l);
 
 //removes data from list at index and pops
+//returns data popped
 void* list_pop_index(list* l,size_t index);
 
 //does a simple memcmpr to check for equality
 //returns NULL on false else returns list_node* object
-list_node* list_indexof_mem(list l,void* obj,size_t size);
+list_node_info list_indexof_mem(list l,void* obj,size_t size);
 
-//does a simple memcmpr to check for equality
+//uses a function to check for equality returns NULL or a list_node
 //returns NULL on false else returns list_node* object
-list_node* list_indexof_cmpr(list l,void* obj,bool (*cmprfunc)(void *, void *));
+list_node_info list_indexof_cmpr(list l,void* obj,bool (*cmprfunc)(void *, void *));
 
 //frees all nodes
 //DOES NOT FREE DATA

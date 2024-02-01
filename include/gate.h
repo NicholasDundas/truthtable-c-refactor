@@ -35,6 +35,8 @@ typedef struct {
     gate_type kind; //type of gate
     size_t size; // indicates size of inputs
     size_t total_size; //total size of params
+
+    size_t depth; //depth of circuit determined by MAX(i1,i2,i3...) where i is an input param
     variable** params; // length determined by kind and size;
     // includes inputs and outputs, indicated by variable numbers
     circuit* cir_ptr;

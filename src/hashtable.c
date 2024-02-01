@@ -17,6 +17,7 @@ void init_hashtable(hashtable *tmp,size_t (*hash)(const char *)) {
 size_t one_one_half(size_t num) {
     return (num << 1) - (num >> 1);
 }
+
 static inline bool hashnode_key_cmpr(void* key, void* htn) {
     return strcmp(key,((hashtable_node*)htn)->key) == 0;
 }
@@ -49,7 +50,7 @@ int hashtable_insert(hashtable* ht,const char *key,void *data) {
         if(hashtable_resize(ht,ht->entry_len << 1))
             return -1;
     } 
-    if (ht->entries[index].size == 0 || !(list_index = list_indexof_cmpr(ht->entries[index],(void*)key,hashnode_key_cmpr))) {
+    if (ht->entries[index].size == 0 || !(list_index = list_indexof_cmpr(ht->entries[index],(void*)key,hashnode_key_cmpr).node)) {
         hashtable_node* tmp = malloc(sizeof(hashtable_node));
         if(!tmp || !init_hashnode(tmp,data,key)) {
             free(tmp);
@@ -76,9 +77,8 @@ static inline int hashtable_insert_node(hashtable* ht,hashtable_node* htn) {
     (one_one_half(ht->entry_len) >> 1) <= ht->entries[index].size) {
         if(hashtable_resize(ht,ht->entry_len << 1)) return -1;
     } 
-    if (ht->entries[index].size == 0 || !(list_index = list_indexof_cmpr(ht->entries[index],htn,hashnode_cmpr))) {
-        list_front_insert(&ht->entries[index],htn);
-        return 0;
+    if (ht->entries[index].size == 0 || !(list_index = list_indexof_cmpr(ht->entries[index],htn,hashnode_cmpr).node)) {
+        return list_front_insert(&ht->entries[index],htn) ? -1 : 0;
     } else {
         free(((hashtable_node*)list_index->data)->key);
         free(list_index->data);
@@ -102,7 +102,9 @@ int hashtable_resize(hashtable *ht, size_t newsize) {
     }
     for(size_t i = 0; i < ht->entry_len; ++i) {
         while(ht->entries[i].size) {
-            hashtable_insert_node(&tmp,ht->entries[i].head->data);
+            if(hashtable_insert_node(&tmp,ht->entries[i].head->data) == -1) {
+                return 1;
+            }
             list_pop_front(&ht->entries[i]);
         }
     }
@@ -119,6 +121,7 @@ void free_hashtable(hashtable* ht) {
         }
     }
 }
+
 void *hashtable_remove(hashtable *ht,const char *key) {
     size_t index = ht->hash(key) % ht->entry_len;
     list_node* transverse = ht->entries[index].head;
@@ -129,6 +132,7 @@ void *hashtable_remove(hashtable *ht,const char *key) {
         prev = transverse;
         transverse = transverse->next;
     }
+
     if(transverse && !res) {
         if(prev) {
             prev->next = transverse->next;
@@ -153,6 +157,7 @@ void *hashtable_get(hashtable ht,const char *key){
     (res = strcmp(((hashtable_node*)transverse->data)->key,key)) != 0) {
         transverse = transverse->next;
     }
+    
     if(transverse && !res)
         return ((hashtable_node*)transverse->data)->data;
     return NULL;

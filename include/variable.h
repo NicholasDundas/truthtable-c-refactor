@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "maybe.h"
 
@@ -16,6 +17,11 @@ typedef struct {
     char *letter; //name of variable
     var_result value; //holds value
     var_type type; //type of variable
+
+    bool determinate; //whether the value of the variable is determinate meaning it was set by another Gate or Input or was a declared as CONST
+
+    size_t line_declared;
+    size_t pos_declared;
 } variable;
 
 //returns whether a value is OUTPUT, DISCARD, or TEMP

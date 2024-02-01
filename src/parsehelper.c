@@ -8,12 +8,16 @@
 void init_ph(parse_helper* tmp) {
     tmp->line = 1;
     tmp->pos = 1;
+    tmp->eofhit = NULL;
+    tmp->eofparam = NULL;
 }
 
 int ph_get(FILE* file, parse_helper* ph) {
     int c = fgetc(file);
     switch(c) {
         case EOF:
+            if(ph->eofhit)
+                ph->eofhit(ph->eofparam);
             return EOF;
         case '\n':
             ph->line++;
@@ -48,7 +52,7 @@ int readbuf_string(FILE* file,char** pbuf,size_t* pbufsize,parse_helper* ph) {
     if(!bufsize || !buf) goto NO_MEM_CLEANUP;
     
     if((c = ph_ignorews(file,ph)) == EOF) goto CLEANUP; //clear leading whitespace characters
-    
+    parse_helper old_ph = *ph;
     if(*buf == NULL || *bufsize < 4) { //if the buffer is less than 4
         *buf = realloc(*buf,4);
         if(!(*buf)) goto NO_MEM_CLEANUP;
@@ -82,6 +86,11 @@ CLEANUP:
     if(!pbuf && buf) {
         if(*buf) free(*buf);
         free(buf);
+    }
+    if(c == '\n') {
+        ph->line = old_ph.line;
+        ph->line = old_ph.pos+num_read_and_written;
+        ungetc(c,file);
     }
     return c == EOF ? EOF : num_read_and_written;
 

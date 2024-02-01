@@ -1,47 +1,47 @@
 [
 {
-  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -g   -o CMakeFiles\\truthtable.dir\\src\\circuit.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\circuit.c\"",
-  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/circuit.c"
+  "directory": "/common/home/npd59/Documents/truthtable_c_refactor/build",
+  "command": "/usr/bin/clang -I/common/home/npd59/Documents/truthtable_c_refactor/include -I/common/home/npd59/Documents/truthtable_c_refactor/src -g -o CMakeFiles/truthtable.dir/src/circuit.c.o -c /common/home/npd59/Documents/truthtable_c_refactor/src/circuit.c",
+  "file": "/common/home/npd59/Documents/truthtable_c_refactor/src/circuit.c"
 },
 {
-  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -g   -o CMakeFiles\\truthtable.dir\\src\\func.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\func.c\"",
-  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/func.c"
+  "directory": "/common/home/npd59/Documents/truthtable_c_refactor/build",
+  "command": "/usr/bin/clang -I/common/home/npd59/Documents/truthtable_c_refactor/include -I/common/home/npd59/Documents/truthtable_c_refactor/src -g -o CMakeFiles/truthtable.dir/src/func.c.o -c /common/home/npd59/Documents/truthtable_c_refactor/src/func.c",
+  "file": "/common/home/npd59/Documents/truthtable_c_refactor/src/func.c"
 },
 {
-  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -g   -o CMakeFiles\\truthtable.dir\\src\\gate.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\gate.c\"",
-  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/gate.c"
+  "directory": "/common/home/npd59/Documents/truthtable_c_refactor/build",
+  "command": "/usr/bin/clang -I/common/home/npd59/Documents/truthtable_c_refactor/include -I/common/home/npd59/Documents/truthtable_c_refactor/src -g -o CMakeFiles/truthtable.dir/src/gate.c.o -c /common/home/npd59/Documents/truthtable_c_refactor/src/gate.c",
+  "file": "/common/home/npd59/Documents/truthtable_c_refactor/src/gate.c"
 },
 {
-  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -g   -o CMakeFiles\\truthtable.dir\\src\\hashtable.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\hashtable.c\"",
-  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/hashtable.c"
+  "directory": "/common/home/npd59/Documents/truthtable_c_refactor/build",
+  "command": "/usr/bin/clang -I/common/home/npd59/Documents/truthtable_c_refactor/include -I/common/home/npd59/Documents/truthtable_c_refactor/src -g -o CMakeFiles/truthtable.dir/src/hashtable.c.o -c /common/home/npd59/Documents/truthtable_c_refactor/src/hashtable.c",
+  "file": "/common/home/npd59/Documents/truthtable_c_refactor/src/hashtable.c"
 },
 {
-  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -g   -o CMakeFiles\\truthtable.dir\\src\\list.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\list.c\"",
-  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/list.c"
+  "directory": "/common/home/npd59/Documents/truthtable_c_refactor/build",
+  "command": "/usr/bin/clang -I/common/home/npd59/Documents/truthtable_c_refactor/include -I/common/home/npd59/Documents/truthtable_c_refactor/src -g -o CMakeFiles/truthtable.dir/src/list.c.o -c /common/home/npd59/Documents/truthtable_c_refactor/src/list.c",
+  "file": "/common/home/npd59/Documents/truthtable_c_refactor/src/list.c"
 },
 {
-  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -g   -o CMakeFiles\\truthtable.dir\\src\\maybe.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\maybe.c\"",
-  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/maybe.c"
+  "directory": "/common/home/npd59/Documents/truthtable_c_refactor/build",
+  "command": "/usr/bin/clang -I/common/home/npd59/Documents/truthtable_c_refactor/include -I/common/home/npd59/Documents/truthtable_c_refactor/src -g -o CMakeFiles/truthtable.dir/src/maybe.c.o -c /common/home/npd59/Documents/truthtable_c_refactor/src/maybe.c",
+  "file": "/common/home/npd59/Documents/truthtable_c_refactor/src/maybe.c"
 },
 {
-  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -g   -o CMakeFiles\\truthtable.dir\\src\\parsehelper.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\parsehelper.c\"",
-  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/parsehelper.c"
+  "directory": "/common/home/npd59/Documents/truthtable_c_refactor/build",
+  "command": "/usr/bin/clang -I/common/home/npd59/Documents/truthtable_c_refactor/include -I/common/home/npd59/Documents/truthtable_c_refactor/src -g -o CMakeFiles/truthtable.dir/src/parsehelper.c.o -c /common/home/npd59/Documents/truthtable_c_refactor/src/parsehelper.c",
+  "file": "/common/home/npd59/Documents/truthtable_c_refactor/src/parsehelper.c"
 },
 {
-  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -g   -o CMakeFiles\\truthtable.dir\\src\\truthtable.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\truthtable.c\"",
-  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/truthtable.c"
+  "directory": "/common/home/npd59/Documents/truthtable_c_refactor/build",
+  "command": "/usr/bin/clang -I/common/home/npd59/Documents/truthtable_c_refactor/include -I/common/home/npd59/Documents/truthtable_c_refactor/src -g -o CMakeFiles/truthtable.dir/src/truthtable.c.o -c /common/home/npd59/Documents/truthtable_c_refactor/src/truthtable.c",
+  "file": "/common/home/npd59/Documents/truthtable_c_refactor/src/truthtable.c"
 },
 {
-  "directory": "F:/Coding Projects/C/truthtable_c_refactor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/truthtable.dir/includes_C.rsp -g   -o CMakeFiles\\truthtable.dir\\src\\variable.c.obj   -c \"F:\\Coding Projects\\C\\truthtable_c_refactor\\src\\variable.c\"",
-  "file": "F:/Coding Projects/C/truthtable_c_refactor/src/variable.c"
+  "directory": "/common/home/npd59/Documents/truthtable_c_refactor/build",
+  "command": "/usr/bin/clang -I/common/home/npd59/Documents/truthtable_c_refactor/include -I/common/home/npd59/Documents/truthtable_c_refactor/src -g -o CMakeFiles/truthtable.dir/src/variable.c.o -c /common/home/npd59/Documents/truthtable_c_refactor/src/variable.c",
+  "file": "/common/home/npd59/Documents/truthtable_c_refactor/src/variable.c"
 }
 ]

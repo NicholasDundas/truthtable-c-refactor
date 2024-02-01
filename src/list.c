@@ -140,20 +140,22 @@ void* list_pop_index(list* l,size_t index) {
     }
 }
 
-list_node* list_indexof_mem(list l, void *obj, size_t size) {   
-    list_node* node = l.head;
-    while(node && memcmp(node->data,obj,size)) {
-        node = node->next;
+list_node_info list_indexof_mem(list l, void *obj, size_t size) {   
+    list_node_info lni = {.node = l.head, .index = 0};
+    while(lni.node && memcmp(lni.node->data,obj,size)) {
+        lni.node = lni.node->next;
+        ++lni.index;
     }
-    return node;
+    return lni;
 }
 
-list_node* list_indexof_cmpr(list l, void *obj, bool (*cmprfunc)(void *, void *)) {
-    list_node* node = l.head;
-    while(node && !cmprfunc(obj,node->data)) {
-        node = node->next;
+list_node_info list_indexof_cmpr(list l, void *obj, bool (*cmprfunc)(void *, void *)) {
+    list_node_info lni = {.node = l.head, .index = 0};
+    while(lni.node && !cmprfunc(obj,lni.node->data)) {
+        lni.node = lni.node->next;
+        ++lni.index;
     }
-    return node;
+    return lni;
 }
 
 void free_list(list* l) {

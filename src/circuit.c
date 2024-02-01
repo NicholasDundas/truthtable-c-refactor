@@ -13,8 +13,7 @@
 #include "hashtable.h"
 #include "parsehelper.h"
 
-//format specifer : buffer (char*), line (size_t), char position (size_t)
-const char* eof_str = "ERROR: Unexpected end of file.\nBUFFER:\"%s\"\nLINE:%zu\nPOSITION:%zu\n";
+const char* eof_str = "ERROR: Unexpected end of file.\nBuffer:%s";
 
 size_t get_var(circuit* c, char* name) { 
     if (c == NULL || name == NULL) {
@@ -30,7 +29,7 @@ inline static size_t min_len(size_t a, size_t b) {
     return a < b ? a : b;
 }
 
-int insert_var(circuit* c, var_type type, char* name, var_result value) {
+int insert_var(circuit* c, var_type type, char* name, var_result value,size_t line,size_t pos) {
     if (c != NULL && name != NULL) {
         if (c->var_len >= c->var_cap) {
             c->var_cap *= 2;
@@ -49,6 +48,8 @@ int insert_var(circuit* c, var_type type, char* name, var_result value) {
         c->variables[c->var_len]->type = type;
         c->variables[c->var_len]->value = value;
 
+        c->variables[c->var_len]->line_declared = line;
+        c->variables[c->var_len]->pos_declared = pos;
         ++c->var_len;
         return 0;
     }
@@ -65,7 +66,7 @@ inline void cir_defined_at(circuit* cir,size_t line,size_t pos) {
     cir->pos_defined = pos;
 }
 
-int init_circuit(circuit* cir,const char* name,hashtable* newdict) {
+int init_circuit(circuit* cir,const char* name,circuit* outer_cir) {
     if (cir) {
         cir->type = cir_init;
         size_t namelen = strlen(name);
@@ -83,13 +84,13 @@ int init_circuit(circuit* cir,const char* name,hashtable* newdict) {
         cir->variables = malloc(sizeof(variable*) * cir->var_cap);
 
         init_hashtable(&cir->circuit_dictionary,hash) ;
-        cir->inherited_dictionary = newdict;
+        cir->outer_cir = outer_cir;
 
         //Inserting Constants into Circuit
         if(!cir->name || !cir->variables || !cir->gates || 
-        insert_var(cir, CONST, "0", var_false) ||
-        insert_var(cir, CONST, "1", var_true) || 
-        insert_var(cir, DISCARD, "_", var_uneval)) {
+        insert_var(cir, CONST, "0", var_false,0,0) ||
+        insert_var(cir, CONST, "1", var_true,0,0) || 
+        insert_var(cir, DISCARD, "_", var_uneval,0,0)) {
             free_circuit(cir);
             return 1;
         }
@@ -150,7 +151,7 @@ void in_circuit(circuit *cir, size_t in) {
 circuit *get_circuit_reference(circuit* cir, char *name)
 {
     circuit* tmp = hashtable_get(cir->circuit_dictionary,name);
-    if(!tmp) tmp = hashtable_get(*cir->inherited_dictionary,name);
+    if(!tmp) tmp = hashtable_get(cir->outer_cir->circuit_dictionary,name);
     if(!tmp && strcmp(cir->name,name) == 0) tmp = cir;
     return tmp;
 }
@@ -213,7 +214,12 @@ size_t out_circuit(circuit *cir) {
     return num;
 }
 
+inline void print_eof_err(void* buf) {
+    fprintf(stderr,eof_str,*(char**)buf);
+}
+
 circuit* read_from_file_name(char *filename) {
+    errno = 0;
     FILE* finput = fopen(filename,"r");
     if (finput == NULL) {
         fprintf(stderr, "error opening file, \"%s\": %s",filename ,strerror(errno));
@@ -225,42 +231,22 @@ circuit* read_from_file_name(char *filename) {
     init_ph(&ph);
     circuit* cir = malloc(sizeof(circuit));
     init_circuit(cir,"MAIN",NULL);
-    if(!parse_statement(finput,&buf,&buflen,&ph,cir)) {
-        free_circuit(cir);
-        cir = NULL;
-    }
+    while(parse_statement(finput,&buf,&buflen,&ph,cir)) {}
     free(buf);
     return cir;
-}
-
-//same as readbuf_string but prints an end of file error if encountered
-inline int readbuf_string_peof(FILE* file,char** pbuf,size_t* pbufsize,parse_helper* ph) {
-    const char* eof_str = "ERROR: Unexpected end of file.\nBUFFER:\"%s\"\nLINE:%zu\nPOSITION:%zu\n";
-    int res = readbuf_string(file,pbuf,pbufsize,ph);
-    if(feof(file)) {
-        fprintf(stderr,eof_str,(*pbuf),ph->line,(ph->wrd_end - *pbufsize));
-    }
-    return res;
-}
-
-inline int readbuf_uint_peof(FILE* file,char** pbuf,size_t* pnum,size_t* pbufsize,parse_helper* ph) {
-    int res = readbuf_uint(file,pbuf,pnum,pbufsize,ph);
-    if(feof(file)) {
-        fprintf(stderr,eof_str,(*pbuf),ph->line,(ph->wrd_end - *pbufsize));
-    }
-    return res;
 }
 
 inline bool str_reserved(const char* str) {
     //Names reserved for our use
     const char* reserved_names[] = {"CIR", "CONST", "AND", "NAND", "OR", "NOR","XOR", "DECODER","NOT","MULTIPLEXER","PASS","INPUT", "OUTPUT", "_","1","0", "END"};
     for(size_t i = 0; i < sizeof(reserved_names)/sizeof(char*); ++i) {
-        if(strcmp(*str,reserved_names[i]) == 0) {
+        if(strcmp(str,reserved_names[i]) == 0) {
             return true;
         }
     }
     return false;
 }
+
 
 //Attempts to create a circuit header
 //Should check if the circuit needs to be defined afterwards
@@ -269,11 +255,9 @@ inline bool str_reserved(const char* str) {
 //Circuit Already Defined
 //Duplicate Declaration in Scope
 circuit* read_cir_header(FILE* finput, char** buf, size_t* buflen, parse_helper* ph, circuit* outer_cir) {
-    errno = 0;
-    circuit* newcir = NULL;
     const parse_helper funcstart = *ph;
 
-    if(readbuf_string_peof(finput,buf,buflen,ph) < 1) {
+    if(readbuf_string(finput,buf,buflen,ph) < 1) {
         return NULL;
     }
 
@@ -283,7 +267,7 @@ circuit* read_cir_header(FILE* finput, char** buf, size_t* buflen, parse_helper*
     }
 
     //New circuit or does it exist (and where is it)
-    newcir = get_circuit_reference(outer_cir,*buf);
+    circuit* newcir = get_circuit_reference(outer_cir,*buf);
     if(newcir) {
         if(newcir->type == cir_defined) {
             fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is already defined\nLINE:%zu\nPOSITION:%zu\n",(*buf),ph->line,ph->wrd_end - *buflen);
@@ -299,7 +283,7 @@ circuit* read_cir_header(FILE* finput, char** buf, size_t* buflen, parse_helper*
     }
 
     //Grab INPUT identifier
-    if(readbuf_string_peof(finput,buf,buflen,ph) < 1) {
+    if(readbuf_string(finput,buf,buflen,ph) < 1) {
         goto CIR_CLEANUP;
     }
     if(strcmp(*buf,"INPUT") != 0) {
@@ -309,33 +293,36 @@ circuit* read_cir_header(FILE* finput, char** buf, size_t* buflen, parse_helper*
 
     //num of inputs....
     size_t inputnum;
-    if(readbuf_uint_peof(finput,buf,&inputnum,buflen,ph) < 1) {
+    
+    if(readbuf_uint(finput,buf,&inputnum,buflen,ph) < 1) {
         goto CIR_CLEANUP;
     }
     if(newcir->type == cir_declared && inputnum != newcir->input_len) {
-        fprintf(stderr,"ERROR: Circuit declaration mismatch\nFUNC \'%s\' INPUT \'%zu\' OUTPUT \'%zu\' does not match input length found : \"%s\" \nLINE:%zu\nPOSITION:%zu\n",newcir->name,newcir->input_len,newcir->output_len,(*buf),ph->line,ph->wrd_end - *buflen);
+        fprintf(stderr,"ERROR: Circuit declaration mismatch\nFUNC \'%s\' INPUT \'%zu\' OUTPUT \'%zu\' does not match input length found : \"%s\" \nLINE:%zu\nPOSITION:%zu\n"
+        ,newcir->name,newcir->input_len,newcir->output_len,(*buf),ph->line,ph->wrd_end - *buflen);
         goto CIR_CLEANUP;
     } else if (inputnum > MAX_VAR_COUNT) {
         fprintf(stderr,"ERROR: \"%s\" exceeds max variable length\nLINE:%zu\nPOSITION:%zu\n",*buf,ph->line,ph->wrd_end - *buflen);
         goto CIR_CLEANUP;
     }
     newcir->input_len = inputnum;
-
     //Reading Output Identifier
-    if(readbuf_string_peof(finput,buf,buflen,ph) < 1) {
+    if(readbuf_string(finput,buf,buflen,ph) < 1) {
         goto CIR_CLEANUP;
     }
     if(strcmp(*buf,"OUTPUT") == 0) {
         if (declared_in_scope(*outer_cir,newcir->name)) {
-            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is declared already as a circuit on line: %zu, position %zu\nLINE:%zu\nPOSITION:%zu\n",*buf,newcir->line_declared,newcir->pos_declared,ph->line,ph->wrd_end - *buflen);
+            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is declared already as a circuit on line: %zu, position %zu\nLINE:%zu\nPOSITION:%zu\n"
+            ,*buf,newcir->line_declared,newcir->pos_declared,ph->line,ph->wrd_end - *buflen);
             goto CIR_CLEANUP;
         }
 READOUTPUT: 
-        if(readbuf_uint_peof(finput,buf,&inputnum,buflen,ph) < 1) {
+        if(readbuf_uint(finput,buf,&inputnum,buflen,ph) < 1) {
             goto CIR_CLEANUP;
         }
         if(newcir->type == cir_declared && inputnum != newcir->output_len) {
-            fprintf(stderr,"ERROR: Circuit function declaration mismatch\nFUNC \'%s\' INPUT \'%zu\' OUTPUT \'%zu\' does not match output length previously declared : \"%s\" \nLINE:%zu\nPOSITION:%zu\n",newcir->name,newcir->input_len,newcir->output_len,(*buf),ph->line,ph->wrd_end - *buflen);
+            fprintf(stderr,"ERROR: Circuit function declaration mismatch\nFUNC \'%s\' INPUT \'%zu\' OUTPUT \'%zu\' does not match output length previously declared : \"%s\" \nLINE:%zu\nPOSITION:%zu\n"
+            ,newcir->name,newcir->input_len,newcir->output_len,(*buf),ph->line,ph->wrd_end - *buflen);
             goto CIR_CLEANUP;
         } else if (inputnum > MAX_VAR_COUNT) {
             fprintf(stderr,"ERROR: \"%s\" exceeds max variable length\nLINE:%zu\nPOSITION:%zu\n",(*buf),ph->line,ph->wrd_end - *buflen);
@@ -347,6 +334,9 @@ READOUTPUT:
             newcir->pos_declared = funcstart.pos;
             return newcir;
         }
+        if(readbuf_uint(finput,buf,&inputnum,buflen,ph) < 1) {
+            goto CIR_CLEANUP;
+        }
     }
     //read in input or output vars
     while(inputnum--) {
@@ -355,24 +345,26 @@ READOUTPUT:
             goto CIR_CLEANUP;
         }
         if(declared_in_scope(*outer_cir,*buf)) {
-            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is declared already as a circuit on line: %zu, position %zu\nLINE:%zu\nPOSITION:%zu\n",*buf,newcir->line_declared,newcir->pos_declared,ph->line,ph->wrd_end - *buflen);
+            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is declared already as a circuit on line: %zu, position %zu\nLINE:%zu\nPOSITION:%zu\n"
+            ,*buf,newcir->line_declared,newcir->pos_declared,ph->line,ph->wrd_end - *buflen);
             goto CIR_CLEANUP;
         }        
         if(get_var(newcir,*buf) != newcir->var_len) {
-            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is already declared as a variable previously\nLINE:%zu\nPOSITION:%zu\n",*buf,ph->line,ph->wrd_end - *buflen);
+            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is already declared as a variable previously\nLINE:%zu\nPOSITION:%zu\n"
+            ,*buf,ph->line,ph->wrd_end - *buflen);
             goto CIR_CLEANUP;
         }
-        if(!insert_var(newcir,INPUT,*buf,var_uneval)) {
+        if(!insert_var(newcir,INPUT,*buf,var_uneval,ph->line,ph->wrd_end-*buflen)) {
             goto CIR_CLEANUP;
         }
-        if(readbuf_string_peof(finput,buf,buflen,ph) < 1) {
+        if(readbuf_string(finput,buf,buflen,ph) < 1) {
             goto CIR_CLEANUP;
         }
     }
 
     if(newcir->type == cir_init) {
         newcir->type = cir_defined;
-        if(readbuf_string_peof(finput,buf,buflen,ph) < 1) {
+        if(readbuf_string(finput,buf,buflen,ph) < 1) {
             goto CIR_CLEANUP;
         }
         if(strcmp(*buf,"OUTPUT") != 0) {
@@ -388,32 +380,65 @@ CIR_CLEANUP:
     return NULL;
 }
 
+typedef enum { parse_eof, parse_success, parse_error};
 
 int parse_statement(FILE* finput, char** buf,size_t* buflen,parse_helper*ph,circuit* c) {
+    parse_helper old_ph = *ph;
+    ph->eofhit = print_eof_err;
+    ph->eofparam = &buf;
+    if(readbuf_string(finput,buf,buflen,ph) < 1) {
+        goto PARSE_FAIL;
+    }
     if(strcmp(*buf,"CIR") == 0) { //We are parsing a Function Declaration or Definition
-        parse_helper func_ph = *ph;
         circuit* newcir = read_cir_header(finput,buf,buflen,ph,c);
         if(!newcir) { //error reading header...
-            fprintf(stderr,"CIRCUIT HEADER ERROR\nLINE:%zu\nPOS:%zu\n",func_ph.line,(func_ph.wrd_end - strlen("FUNC")));
-            return false;
+            fprintf(stderr,"CIRCUIT HEADER ERROR\nLINE:%zu\nPOS:%zu\n",old_ph.line,(old_ph.wrd_end - strlen("FUNC")));
+            goto PARSE_FAIL;
         }
         if(!hashtable_insert(&c->circuit_dictionary,newcir->name,newcir)) { //malloc failure?
-            fprintf(stderr,"CIRCUIT DICTIONARY INSERTION ERROR\nFUNC NAME:'%s'\nLINE:%zu\n",newcir->name,func_ph.line);
-            return false;
+            fprintf(stderr,"CIRCUIT DICTIONARY INSERTION ERROR\nFUNC NAME:'%s'\nLINE:%zu\n",newcir->name,old_ph.line);
+            goto PARSE_FAIL;
         }
         if(newcir->type == cir_defined) { //defined circuit
-            while(parse_statement(finput,buf,buflen,ph,newcir)) {}
+            while(parse_statement(finput,buf,buflen,ph,newcir) == parse_success) {}
             if(strcmp(*buf,"END") != 0) {
-                if(feof(finput)) {
-                    fprintf(stderr,eof_str,(*buf),ph->line,ph->wrd_end - *buflen);
-                }
-                return false;
-            }
-            if(!valid_circuit(*newcir)) {
-                fprintf(stderr,"INVALID CIRCUIT ERROR\nFUNC NAME:'%s'\nLINE:%zu\n",newcir->name,func_ph.line);
+                goto PARSE_FAIL;
             }
         } 
+    } else if(strcmp(*buf, "CONST") == 0) { //Constant Variables
+        if(readbuf_string(finput,buf,buflen,ph) < 1) {
+            goto PARSE_FAIL;
+        }
+        if(str_reserved(buf)) {
+            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is reserved\nLINE:%zu\nPOSITION:%zu\n",*buf,ph->line,ph->wrd_end - *buflen);
+            goto PARSE_FAIL;
+        }
+        circuit* tmp = get_circuit_reference(c,buf);
+        if(!tmp) {
+            fprintf(stderr,"ERROR: \"%s\" cannot be used as a name as it is exists as a circuit declared on line: %zu, position %zu\nLINE:%zu\nPOSITION:%zu\n",
+            *buf,tmp->line_declared,tmp->pos_declared,ph->line,ph->wrd_end - *buflen);
+            goto PARSE_FAIL;
+        }
+        for(size_t i = 0; i < c->var_len; ++i) {
+            if(strcmp(*buf,c->variables[i]->letter) == 0) {
+                fprintf(stderr,"ERROR: \"%s\" cannot be used as a variable as it is exists as a variable within the circuit declared on line: %zu, position %zu\nLINE:%zu\nPOSITION:%zu\n",
+                *buf,c->variables[i]->line_declared,c->variables[i]->pos_declared,ph->line,ph->wrd_end - *buflen);
+                goto PARSE_FAIL;
+            }
+        }
+
+        //Read value or other constant 
+        //TODO
+
+        if(!insert_var(c,INPUT,*buf,/*TODO VALUE*/,ph->line,ph->wrd_end-*buflen)) {
+            goto PARSE_FAIL;
+        }
     }
+
+PARSE_FAIL:
+    ph->eofhit = old_ph.eofhit;
+    ph->eofparam = old_ph.eofparam;
+    return parse_error;
 }
 
 

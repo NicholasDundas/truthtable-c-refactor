@@ -10,6 +10,8 @@ typedef struct {
     size_t line;
     size_t pos;
     size_t wrd_end; //points to the last character after a word
+    void (*eofhit)(void*);
+    void* eofparam;
 } parse_helper;
 
 

@@ -18,7 +18,7 @@
 typedef enum { cir_init,cir_declared, cir_defined, cir_freed} cir_type; 
 
 //Circuit struct to hold information about gates and variables
-typedef struct Circuit {
+typedef struct circuit {
     gate* gates; //All Gates
     size_t gate_len; //Amount of circuits to run
     size_t gate_cap; //Capacity of gate* (used for realloc efficiency)
@@ -39,7 +39,7 @@ typedef struct Circuit {
     size_t output_len;
     char* name;
     hashtable circuit_dictionary; //contains circuits
-    hashtable* inherited_dictionary; //contains circuits we have inherited from the outerscope
+    struct circuit* outer_cir; //contains circuits we have inherited from the outerscope
 
     cir_type type;
     size_t line_declared;
@@ -54,11 +54,11 @@ typedef struct Circuit {
 
 //Attempts to insert a variable into c
 //Returns 1 on success or 0 on failure
-int insert_var(circuit* c, var_type type, char* name, var_result value); 
+int insert_var(circuit* c, var_type type, char* name, var_result value,size_t line,size_t pos); 
 
 //Initialize an Empty Circuit
 //returns 0 on success or 1 on failure
-int init_circuit(circuit* cir,const char* name,hashtable* newdict);
+int init_circuit(circuit* cir,const char* name,circuit* newdict);
 
 //Free a circuit (Must be initialized)
 void free_circuit(circuit* cir);
@@ -104,13 +104,8 @@ void print_circuit(FILE* file,circuit* cir);
 //read in a circuit from a file
 circuit* read_from_file_name(char *filename); 
 
-bool valid_circuit(circuit c) {
-    
-}
-
 //parses a statement
 //0 is failure
 //1 is success
-//2 is end of a circuit function statement
 int parse_statement(FILE* finput, char** buf,size_t* bufsize,parse_helper*ph,circuit* c);
 #endif
